@@ -6,8 +6,9 @@ import com.ning.http.client.{AsyncHandler, HttpResponseBodyPart, HttpResponseHea
 
 import scala.concurrent.Promise
 
+case class ExceedsSize(allowed:Long) extends RuntimeException(s"Exceeds allowed max size ${allowed}")
+
 class HttpHandler(config:CrawlConfig) extends AsyncHandler[Unit]{
-  val MAX_SIZE_EXCEEDED: String = "Exceeds allowed max size"
   var body = new ResponseBody
   val httpBody = Promise[String]()
   var statusCode:Int = 200
@@ -21,7 +22,7 @@ class HttpHandler(config:CrawlConfig) extends AsyncHandler[Unit]{
     val part = bodyPart.getBodyPartBytes
     body.write(part)
     if (body.exceedsSize(config.maxSize)){
-      httpBody.failure(new RuntimeException(MAX_SIZE_EXCEEDED))
+      httpBody.failure(ExceedsSize(config.maxSize))
       return STATE.ABORT
     }
     STATE.CONTINUE
@@ -36,7 +37,7 @@ class HttpHandler(config:CrawlConfig) extends AsyncHandler[Unit]{
     val headers = new ResponseHeaders(httpResponseHeaders)
     httpResponse.success(HttpResponse(statusCode, httpBody.future, headers.redirectLocation))
     if(headers.exceedsSize(config.maxSize)) {
-      httpBody.failure(new RuntimeException(MAX_SIZE_EXCEEDED))
+      httpBody.failure(ExceedsSize(config.maxSize))
       return STATE.ABORT
     }
     STATE.CONTINUE

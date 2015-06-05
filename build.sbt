@@ -12,3 +12,5 @@ libraryDependencies += "commons-io" % "commons-io" % "2.4"
 libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.4" % "test"
 
 libraryDependencies += "org.mockito" % "mockito-all" % "1.9.5"
+
+publishTo := Some("Indix Release Artifactory" at "http://artifacts.indix.tv:8081/artifactory/libs-release-local")
