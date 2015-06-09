@@ -36,6 +36,7 @@ class HttpHandler(config:CrawlConfig) extends AsyncHandler[Unit]{
   override def onHeadersReceived(httpResponseHeaders: HttpResponseHeaders): STATE = {
     val headers = new ResponseHeaders(httpResponseHeaders)
     httpResponse.success(HttpResponse(statusCode, httpBody.future, headers.redirectLocation))
+    headers.encoding.foreach(body.useCharset)
     if(headers.exceedsSize(config.maxSize)) {
       httpBody.failure(ExceedsSize(config.maxSize))
       return STATE.ABORT

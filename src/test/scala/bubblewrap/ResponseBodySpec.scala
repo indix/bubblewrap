@@ -24,4 +24,14 @@ class ResponseBodySpec extends FlatSpec {
     body.exceedsSize(11) should be(false)
     body.exceedsSize(10) should be(true)
   }
+
+  it should "use the content encoding to encode the bytes back to string"  in {
+    val koreanString = "동서게임 MS정품유선컨트롤러/PCGTA5호환 - 11번가"
+    val body = new ResponseBody
+
+    body.useCharset("EUC-KR")
+    body.write(koreanString.getBytes("EUC-KR"))
+
+    body.content should be(koreanString)
+  }
 }

@@ -30,4 +30,12 @@ class ResponseHeadersSpec extends FlatSpec {
 
     headers.redirectLocation should be(None)
   }
+
+  it should "parse out content encoding from Content-Type header" in {
+    val headers: ResponseHeaders = new ResponseHeaders(new HttpResponseHeaders() {
+      override def getHeaders = new FluentCaseInsensitiveStringsMap().add("Content-Type", "text/html; charset=EUC-JP")
+    })
+
+    headers.encoding should be(Some("EUC-JP"))
+  }
 }

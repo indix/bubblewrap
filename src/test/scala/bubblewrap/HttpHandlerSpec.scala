@@ -101,4 +101,17 @@ class HttpHandlerSpec extends FlatSpec {
 
     get(response).location should be(Some("/home"))
   }
+
+  it should "use the content-type header to parse the body part" in {
+    val koreanString = "동서게임 MS정품유선컨트롤러/PCGTA5호환 - 11번가"
+    val handler = new HttpHandler(config)
+    val response = handler.httpResponse.future
+    handler.onStatusReceived(httpStatus(200))
+
+    handler.onHeadersReceived(httpHeaders("Content-Type" -> "text/html; charset=euc-kr"))
+    handler.onBodyPartReceived(bodyPart(koreanString.getBytes("euc-kr")))
+    handler.onCompleted()
+
+    get(get(response).body) should be(koreanString)
+  }
 }

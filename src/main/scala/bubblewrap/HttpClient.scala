@@ -34,14 +34,18 @@ class HttpClient(clientSettings:ClientSettings = new ClientSettings()) {
   def get(url: String, config:CrawlConfig) = {
     val handler = new HttpHandler(config)
     val request = client.prepareGet(url)
-    config.proxy.foreach(proxy => request.setProxyServer(new ProxyServer(proxy.host,proxy.port)))
+    config.proxy.foreach{
+      case PlainProxy(host, port) => request.setProxyServer(new ProxyServer(host,port))
+      case ProxyWithAuth(host, port, user, pass) => request.setProxyServer(new ProxyServer(host, port, user, pass))
+    }
     request
       .addHeader(ACCEPT, "*/*")
       .addHeader(ACCEPT_ENCODING, GZIP)
       .addHeader(USER_AGENT, config.userAgent)
       .setCookies(HttpClient.cookies(config,url).asJava)
-      .execute(handler)
-    println(request.build().toString)
+
+    config.customHeaders.headers.foreach(header => request.addHeader(header._1, header._2))
+    request.execute(handler)
     handler.httpResponse.future
   }
 }
