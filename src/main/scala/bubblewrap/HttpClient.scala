@@ -31,9 +31,9 @@ class HttpClient(clientSettings:ClientSettings = new ClientSettings()) {
                                       .setSslContext(lenientSSLContext)
   )
 
-  def get(url: String, config:CrawlConfig) = {
+  def get(url: WebUrl, config:CrawlConfig) = {
     val handler = new HttpHandler(config)
-    val request = client.prepareGet(url)
+    val request = client.prepareGet(url.toString)
     config.proxy.foreach{
       case PlainProxy(host, port) => request.setProxyServer(new ProxyServer(host,port))
       case ProxyWithAuth(host, port, user, pass) => request.setProxyServer(new ProxyServer(host, port, user, pass))
@@ -42,7 +42,7 @@ class HttpClient(clientSettings:ClientSettings = new ClientSettings()) {
       .addHeader(ACCEPT, "*/*")
       .addHeader(ACCEPT_ENCODING, GZIP)
       .addHeader(USER_AGENT, config.userAgent)
-      .setCookies(HttpClient.cookies(config,url).asJava)
+      .setCookies(HttpClient.cookies(config,url.toString).asJava)
 
     config.customHeaders.headers.foreach(header => request.addHeader(header._1, header._2))
     request.execute(handler)

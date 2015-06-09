@@ -16,10 +16,12 @@ object WebUrl {
     val scheme = toLowercase(url.getScheme)
     val host = toLowercase(url.getHost)
     val path = (removeDotSegments andThen removeDuplicateSlashes)(url.getPath)
-    val query = (removeSessionIdQueries)(url.getQuery)
+    val query = Option(url.getQuery).map(removeSessionIdQueries).orNull
     
     WebUrl(new URI(scheme, url.getUserInfo, host, port, path, query, url.getFragment).toString)
   }
+
+  def raw(urlString: String) = WebUrl(urlString)
 
   def removeDuplicateSlashes = (path:String) => path.replaceAll("//+","/")
   def removeDotSegments = (path:String) => path.replaceAll("/\\.\\./", "/").replaceAll("/\\./","/")
