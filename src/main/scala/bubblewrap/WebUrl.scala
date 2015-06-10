@@ -5,10 +5,10 @@ import java.net.{URI, URL}
 
 case class WebUrl(url:String){
   override def toString = url
+  def normalized = WebUrl.from(url)
 }
 
 object WebUrl {
-  val tripletsToReplace = ('a'.to('z') ++ 'A'.to('Z') ++ '0'.to('9') ++ List('-', '.', '_', '~')).map(c => "%" + Integer.toHexString(c) -> c.toString)
   val sessionQuery = "(jsessionid|phpsessid|aspsessionid)=.*"
   def from(urlString: String) = {
     val url = new URI(urlString)
