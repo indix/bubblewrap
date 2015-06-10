@@ -37,4 +37,10 @@ class WebUrlSpec extends FlatSpec {
     WebUrl.from("http://www.example.com/a/?phpsessid=123&a=2&b=3").toString should be("http://www.example.com/a/?a=2&b=3")
     WebUrl.from("http://www.example.com/a/?aspsessionid=123&a=2&b=3").toString should be("http://www.example.com/a/?a=2&b=3")
   }
+
+  it should "resolve relative url wrt base url" in {
+    WebUrl.from("http://www.example.com/a/?jsessionid=123&a=2&b=3").resolve("/new/path").toString should be("http://www.example.com/new/path")
+    WebUrl.from("http://www.example.com/a/?jsessionid=123&a=2&b=3").resolve("new/path").toString should be("http://www.example.com/a/new/path")
+    WebUrl.from("http://www.example.com/a/?jsessionid=123&a=2&b=3").resolve("http://www.example.com/new/path").toString should be("http://www.example.com/new/path")
+  }
 }

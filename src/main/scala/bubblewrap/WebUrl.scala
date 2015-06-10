@@ -6,6 +6,7 @@ import java.net.{URI, URL}
 case class WebUrl(url:String){
   override def toString = url
   def normalized = WebUrl.from(url)
+  def resolve(relative:String) = WebUrl(new URI(url).resolve(relative).toString)
 }
 
 object WebUrl {
