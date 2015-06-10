@@ -9,7 +9,8 @@ class ResponseHeaders(httpResponseHeaders: HttpResponseHeaders) {
 
   def exceedsSize(size:Long) = httpResponseHeaders.getHeaders.get("Content-Length").exists(_.toLong > size)
   def redirectLocation = httpResponseHeaders.getHeaders.get("Location").headOption
-  def encoding = httpResponseHeaders.getHeaders.get("Content-Type").headOption.collect {
+  def encoding = contentType.collect {
     case Charset(enc) => enc
   }
+  def contentType = httpResponseHeaders.getHeaders.get("Content-Type").headOption
 }
