@@ -2,15 +2,14 @@ package bubblewrap
 
 import java.net.URL
 import java.security.cert.X509Certificate
-import java.util.concurrent.Executor
-import javax.net.ssl.{TrustManager, X509TrustManager, SSLContext}
+import javax.net.ssl.{SSLContext, X509TrustManager}
 
 import com.ning.http.client._
 import com.ning.http.client.cookie.Cookie
-import org.jboss.netty.handler.codec.http.HttpHeaders
+import org.jboss.netty.handler.codec.http.HttpHeaders.Names._
+import org.jboss.netty.handler.codec.http.HttpHeaders.Values._
+
 import scala.collection.JavaConverters._
-import HttpHeaders.Names._
-import HttpHeaders.Values._
 
 class HttpClient(clientSettings:ClientSettings = new ClientSettings()) {
   val lenientSSLContext: SSLContext = {
@@ -32,7 +31,7 @@ class HttpClient(clientSettings:ClientSettings = new ClientSettings()) {
   )
 
   def get(url: WebUrl, config:CrawlConfig) = {
-    val handler = new HttpHandler(config)
+    val handler = new HttpHandler(config, url)
     val request = client.prepareGet(url.toString)
     config.proxy.foreach{
       case PlainProxy(host, port) => request.setProxyServer(new ProxyServer(host,port))

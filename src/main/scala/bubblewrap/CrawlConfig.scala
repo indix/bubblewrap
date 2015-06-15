@@ -1,7 +1,5 @@
 package bubblewrap
 
-import scala.concurrent.Future
-
 case class CrawlConfig(proxy:Option[Proxy], userAgent:String, maxSize: Long, cookies:Cookies = Cookies None, customHeaders: RequestHeaders = RequestHeaders None)
 case class RequestHeaders(headers: Map[String,String]) {
   def +(header:(String,String)) = this.copy(headers + header)
@@ -15,7 +13,13 @@ object Cookies {
   def None = Cookies(Map.empty)
 }
 
-case class HttpResponse(status:Int, body:Future[String], location:Option[String], headers: ResponseHeaders) {
+trait PageResponse
+
+case class SuccessResponse(page: Page) extends PageResponse
+case class FailureResponse(error: String) extends PageResponse
+
+
+case class HttpResponse(status: Int, pageResponse: PageResponse, headers: ResponseHeaders) {
   def redirectLocation = headers.redirectLocation
   def contentType = headers.contentType
 }

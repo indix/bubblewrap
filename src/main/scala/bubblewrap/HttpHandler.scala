@@ -6,23 +6,23 @@ import com.ning.http.client.{AsyncHandler, HttpResponseBodyPart, HttpResponseHea
 
 import scala.concurrent.Promise
 
-case class ExceedsSize(allowed:Long) extends RuntimeException(s"Exceeds allowed max size ${allowed}")
-
-class HttpHandler(config:CrawlConfig) extends AsyncHandler[Unit]{
+class HttpHandler(config:CrawlConfig, url: WebUrl) extends AsyncHandler[Unit]{
   var body = new ResponseBody
-  val httpBody = Promise[String]()
   var statusCode:Int = 200
   val httpResponse = Promise[HttpResponse]()
+  var headers: ResponseHeaders = null
 
   override def onThrowable(error: Throwable) = httpResponse.failure(error)
 
-  override def onCompleted(): Unit = httpBody.success(body.content)
+  override def onCompleted(): Unit = {
+    httpResponse.success(HttpResponse(statusCode, SuccessResponse(Page(url, body.content, headers)), headers))
+  }
 
   override def onBodyPartReceived(bodyPart: HttpResponseBodyPart): STATE = {
     val part = bodyPart.getBodyPartBytes
     body.write(part)
     if (body.exceedsSize(config.maxSize)){
-      httpBody.failure(ExceedsSize(config.maxSize))
+      httpResponse.success(HttpResponse(statusCode, FailureResponse(s"Exceeds allowed max size ${config.maxSize}"), headers))
       return STATE.ABORT
     }
     STATE.CONTINUE
@@ -34,11 +34,10 @@ class HttpHandler(config:CrawlConfig) extends AsyncHandler[Unit]{
   }
 
   override def onHeadersReceived(httpResponseHeaders: HttpResponseHeaders): STATE = {
-    val headers = new ResponseHeaders(httpResponseHeaders)
-    httpResponse.success(HttpResponse(statusCode, httpBody.future, headers))
-    headers.encoding.foreach(body.useCharset)
+    headers = new ResponseHeaders(httpResponseHeaders)
+    headers.contentCharset.foreach(body.useCharset)
     if(headers.exceedsSize(config.maxSize)) {
-      httpBody.failure(ExceedsSize(config.maxSize))
+      httpResponse.success(HttpResponse(statusCode, FailureResponse(s"Exceeds allowed max size ${config.maxSize}"), headers))
       return STATE.ABORT
     }
     STATE.CONTINUE

@@ -36,6 +36,6 @@ class ResponseHeadersSpec extends FlatSpec {
       override def getHeaders = new FluentCaseInsensitiveStringsMap().add("Content-Type", "text/html; charset=EUC-JP")
     })
 
-    headers.encoding should be(Some("EUC-JP"))
+    headers.contentCharset should be(Some("EUC-JP"))
   }
 }

@@ -7,13 +7,22 @@ import org.jsoup.nodes.{Document, Element}
 
 import scala.collection.JavaConversions._
 
-case class Page(metaRefresh:Option[WebUrl], canonicalUrl:Option[WebUrl], outgoingLinks:List[WebUrl])
+case class Page(url: WebUrl, content: String, contentType: Option[String] = None, contentEncoding: Option[String] = None,
+                contentCharset: Option[String] = None, metaRefresh:Option[WebUrl] = None,
+                canonicalUrl:Option[WebUrl] = None, outgoingLinks:List[WebUrl] = List.empty)
+
+object Page{
+  def apply(url: WebUrl, body: String, responseHeaders: ResponseHeaders): Page = {
+    Page(url, body, responseHeaders.contentType, responseHeaders.contentEncoding, responseHeaders.contentCharset)
+  }
+}
+
 
 class PageParser {
   val MetaUrl = "(?i)[^;]*;\\s*URL\\s*=(.*)".r
-  def parse(url:WebUrl, page: String) = {
-    val doc = Jsoup.parse(page)
-    Page(metaRefresh(url, doc), canonicalUrl(url, doc), outGoingLinks(url, doc))
+  def parse(page: Page) = {
+    val doc = Jsoup.parse(page.content)
+    page.copy(metaRefresh = metaRefresh(page.url, doc), canonicalUrl = canonicalUrl(page.url, doc), outgoingLinks = outgoingLinks(page.url, doc))
   }
 
   private def metaRefresh(baseUrl:WebUrl,doc: Document) = {
@@ -31,7 +40,7 @@ class PageParser {
       .map(element => baseUrl.resolve(element.attr("href")))
   }
 
-  private def outGoingLinks(baseUrl:WebUrl, doc: Document) = {
+  private def outgoingLinks(baseUrl:WebUrl, doc: Document) = {
     (doc.getElementsByTag("a") ++ doc.getElementsByTag("link"))
       .flatMap{ element => extractLink(baseUrl, element) }
       .toList
@@ -44,4 +53,8 @@ class PageParser {
     val isWebPageLink = !(href.contains("javascript:") || href.contains("mailto:") || href.contains("@"))
     if(isWebPageLink && shouldFollow && !isCanonical) Some(baseUrl.resolve(href)) else None
   }
+}
+
+object PageParser {
+  def apply() = new PageParser()
 }
