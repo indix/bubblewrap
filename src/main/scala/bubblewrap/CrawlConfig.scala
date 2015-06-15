@@ -19,7 +19,7 @@ case class SuccessResponse(page: Page) extends PageResponse
 case class FailureResponse(error: String) extends PageResponse
 
 
-case class HttpResponse(status: Int, pageResponse: PageResponse, headers: ResponseHeaders) {
+case class HttpResponse(status: Int, pageResponse: PageResponse, headers: ResponseHeaders, responseTime: Long) {
   def redirectLocation = headers.redirectLocation
   def contentType = headers.contentType
 }
