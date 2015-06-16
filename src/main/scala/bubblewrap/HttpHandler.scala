@@ -16,7 +16,7 @@ class HttpHandler(config:CrawlConfig, url: WebUrl) extends AsyncHandler[Unit]{
   override def onThrowable(error: Throwable) = httpResponse.failure(error)
 
   override def onCompleted(): Unit = {
-    httpResponse.success(HttpResponse(statusCode, SuccessResponse(Page(url, body.content, headers)), headers, responseTime))
+    httpResponse.success(HttpResponse(statusCode, SuccessResponse(Content(url, body.content, headers)), headers, responseTime))
   }
 
   override def onBodyPartReceived(bodyPart: HttpResponseBodyPart): STATE = {

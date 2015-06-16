@@ -7,22 +7,32 @@ import org.jsoup.nodes.{Document, Element}
 
 import scala.collection.JavaConversions._
 
-case class Page(url: WebUrl, content: String, contentType: Option[String] = None, contentEncoding: Option[String] = None,
-                contentCharset: Option[String] = None, metaRefresh:Option[WebUrl] = None,
-                canonicalUrl:Option[WebUrl] = None, outgoingLinks:List[WebUrl] = List.empty)
+case class Content(url: WebUrl, content: String, contentType: Option[String] = None, contentCharset: Option[String] = None,  contentEncoding: Option[String] = None) {
+  def asString = content
+  def asBytes = content.getBytes(contentCharset.getOrElse("UTF-8"))
+}
+case class Page(content:Content,
+                metaRefresh:Option[WebUrl] = None,
+                canonicalUrl:Option[WebUrl] = None,
+                outgoingLinks:List[WebUrl] = List.empty) {
+  def url = content.url
+  def contentType = content.contentType
+  def contentCharset = content.contentCharset
+  def contentEncoding = content.contentEncoding
+}
 
-object Page{
-  def apply(url: WebUrl, body: String, responseHeaders: ResponseHeaders): Page = {
-    Page(url, body, responseHeaders.contentType, responseHeaders.contentEncoding, responseHeaders.contentCharset)
+object Content{
+  def apply(url: WebUrl, body: String, responseHeaders: ResponseHeaders): Content = {
+    Content(url, body,responseHeaders.contentEncoding, responseHeaders.contentCharset, responseHeaders.contentType)
   }
 }
 
 
 class PageParser {
   val MetaUrl = "(?i)[^;]*;\\s*URL\\s*=(.*)".r
-  def parse(page: Page) = {
-    val doc = Jsoup.parse(page.content)
-    page.copy(metaRefresh = metaRefresh(page.url, doc), canonicalUrl = canonicalUrl(page.url, doc), outgoingLinks = outgoingLinks(page.url, doc))
+  def parse(content: Content) = {
+    val doc = Jsoup.parse(content.asString)
+    Page(content, metaRefresh(content.url, doc), canonicalUrl(content.url, doc), outgoingLinks = outgoingLinks(content.url, doc))
   }
 
   private def metaRefresh(baseUrl:WebUrl,doc: Document) = {

@@ -15,7 +15,7 @@ object Cookies {
 
 trait PageResponse
 
-case class SuccessResponse(page: Page) extends PageResponse
+case class SuccessResponse(page: Content) extends PageResponse
 case class FailureResponse(error: String) extends PageResponse
 
 
