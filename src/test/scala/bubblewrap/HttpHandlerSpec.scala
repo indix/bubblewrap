@@ -55,7 +55,7 @@ class HttpHandlerSpec extends FlatSpec with Inside{
 
     handler.onHeadersReceived(httpHeaders("Content-Length" -> "1001")) should be(STATE.ABORT)
     get(response).pageResponse match {
-      case FailureResponse(error) => error should be("Exceeds allowed max size 1000")
+      case FailureResponse(error) => error.getMessage should be("Exceeds allowed max size 1000")
       case _ => fail("Did not produce expected failure response")
     }
   }
@@ -78,7 +78,7 @@ class HttpHandlerSpec extends FlatSpec with Inside{
     handler.onBodyPartReceived(bodyPart(("h"*500).getBytes)) should be(STATE.CONTINUE)
     handler.onBodyPartReceived(bodyPart(("h"*501).getBytes)) should be(STATE.ABORT)
     get(response).pageResponse match {
-      case FailureResponse(error) => error should be("Exceeds allowed max size 1000")
+      case FailureResponse(error) => error.getMessage should be("Exceeds allowed max size 1000")
       case _ => fail("Did not produce expected failure response")
     }
   }

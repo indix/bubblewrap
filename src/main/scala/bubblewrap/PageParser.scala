@@ -10,6 +10,7 @@ import scala.collection.JavaConversions._
 case class Content(url: WebUrl, content: String, contentType: Option[String] = None, contentCharset: Option[String] = None,  contentEncoding: Option[String] = None) {
   def asString = content
   def asBytes = content.getBytes(contentCharset.getOrElse("UTF-8"))
+  def length = content.length
 }
 case class Page(content:Content,
                 metaRefresh:Option[WebUrl] = None,

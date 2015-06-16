@@ -16,10 +16,11 @@ object Cookies {
 trait PageResponse
 
 case class SuccessResponse(page: Content) extends PageResponse
-case class FailureResponse(error: String) extends PageResponse
+case class FailureResponse(error: Throwable) extends PageResponse
+case class ExceededSize(size:Long) extends RuntimeException(s"Exceeds allowed max size ${size}")
 
 
-case class HttpResponse(status: Int, pageResponse: PageResponse, headers: ResponseHeaders, responseTime: Long) {
+case class HttpResponse(status: Int, pageResponse: PageResponse, headers: ResponseHeaders , responseTime: Long) {
   def redirectLocation = headers.redirectLocation
   def contentType = headers.contentType
 }

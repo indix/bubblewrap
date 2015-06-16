@@ -2,7 +2,7 @@ package bubblewrap
 
 
 import com.ning.http.client.AsyncHandler.STATE
-import com.ning.http.client.{AsyncHandler, HttpResponseBodyPart, HttpResponseHeaders, HttpResponseStatus}
+import com.ning.http.client._
 
 import scala.concurrent.Promise
 
@@ -10,10 +10,13 @@ class HttpHandler(config:CrawlConfig, url: WebUrl) extends AsyncHandler[Unit]{
   var body = new ResponseBody
   var statusCode:Int = 200
   val httpResponse = Promise[HttpResponse]()
-  var headers: ResponseHeaders = null
+  var headers: ResponseHeaders = new ResponseHeaders(new HttpResponseHeaders() {
+    override def getHeaders: FluentCaseInsensitiveStringsMap = new FluentCaseInsensitiveStringsMap()
+  })
   val startTime = System.currentTimeMillis()
+  val UNKNOWN_ERROR = 1006
 
-  override def onThrowable(error: Throwable) = httpResponse.failure(error)
+  override def onThrowable(error: Throwable) = httpResponse.success(HttpResponse(UNKNOWN_ERROR, FailureResponse(error), headers, responseTime))
 
   override def onCompleted(): Unit = {
     httpResponse.success(HttpResponse(statusCode, SuccessResponse(Content(url, body.content, headers)), headers, responseTime))
@@ -23,7 +26,7 @@ class HttpHandler(config:CrawlConfig, url: WebUrl) extends AsyncHandler[Unit]{
     val part = bodyPart.getBodyPartBytes
     body.write(part)
     if (body.exceedsSize(config.maxSize)){
-      httpResponse.success(HttpResponse(statusCode, FailureResponse(s"Exceeds allowed max size ${config.maxSize}"), headers, responseTime))
+      httpResponse.success(HttpResponse(statusCode, FailureResponse(ExceededSize(config.maxSize)), headers, responseTime))
       return STATE.ABORT
     }
     STATE.CONTINUE
@@ -38,7 +41,7 @@ class HttpHandler(config:CrawlConfig, url: WebUrl) extends AsyncHandler[Unit]{
     headers = new ResponseHeaders(httpResponseHeaders)
     headers.contentCharset.foreach(body.useCharset)
     if(headers.exceedsSize(config.maxSize)) {
-      httpResponse.success(HttpResponse(statusCode, FailureResponse(s"Exceeds allowed max size ${config.maxSize}"), headers, responseTime))
+      httpResponse.success(HttpResponse(statusCode, FailureResponse(ExceededSize(config.maxSize)), headers, responseTime))
       return STATE.ABORT
     }
     STATE.CONTINUE
