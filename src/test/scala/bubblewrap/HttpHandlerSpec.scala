@@ -43,7 +43,7 @@ class HttpHandlerSpec extends FlatSpec with Inside{
 
     response.isCompleted should be(true)
     get(response).pageResponse match {
-      case SuccessResponse(page) => page.content should be("Hello World")
+      case SuccessResponse(content) => content.asString should be("Hello World")
       case _ => fail("Did not produce expected success response")
     }
   }
@@ -105,7 +105,7 @@ class HttpHandlerSpec extends FlatSpec with Inside{
     handler.onCompleted()
 
     get(response).pageResponse match {
-      case SuccessResponse(page) => page.content should be(koreanString)
+      case SuccessResponse(content) => content.asString should be(koreanString)
       case _ => fail("Did not produce expected success response")
     }
   }

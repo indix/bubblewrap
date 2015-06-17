@@ -22,7 +22,7 @@ object WebUrl {
     val port = removePortIfDefault(url.getProtocol)(url.getPort)
     val scheme = toLowercase(url.getProtocol)
     val host = toLowercase(url.getHost)
-    val path = (removeDotSegments andThen removeDuplicateSlashes andThen replaceOctets)(url.getPath)
+    val path = (removeDuplicateSlashes andThen removeDotSegments andThen replaceOctets)(url.getPath)
     val query = Option(url.getQuery).map(removeSessionIdQueries)
 
     WebUrl(new URL(scheme, host, port, query.map(path + "?" + _).getOrElse(path)).toString)
@@ -32,7 +32,11 @@ object WebUrl {
 
   def removeDuplicateSlashes = (path: String) => path.replaceAll("//+", "/")
 
-  def removeDotSegments = (path: String) => path.replaceAll("/\\.\\./", "/").replaceAll("/\\./", "/")
+  def removeDotSegments = (path: String) => "/" + path.split("/", -1).drop(1)
+      .filterNot(_.trim.equals("."))
+      .foldLeft(List[String]())((sofar, segment) => if (segment.trim == "..") sofar.drop(1) else segment :: sofar)
+      .reverse
+      .mkString("/")
 
   def removePortIfDefault(scheme: String) = (port: Int) => if (scheme == "http" && port == 80) -1 else port
 

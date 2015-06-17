@@ -5,6 +5,8 @@ import java.net.{URI, URL}
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers.{be, convertToAnyShouldWrapper}
 
+import scala.io.Source
+
 class WebUrlSpec extends FlatSpec {
   "WebUrl" should "convert upper case host name to lower case" in {
     WebUrl.from("http://www.Example.com/").toString should be("http://www.example.com/")
@@ -28,7 +30,8 @@ class WebUrlSpec extends FlatSpec {
   }
 
   it should "remove /../ and /./" in {
-    WebUrl.from("http://www.example.com/../a/b/../c/./d.html").toString() should be("http://www.example.com/a/b/c/d.html")
+    WebUrl.from("http://www.example.com/../a/b/../c/./d.html").toString() should be("http://www.example.com/a/c/d.html")
+    WebUrl.from("http://www.example.com/products/outdoor-lighting/../../awesome_wall-light/").toString() should be("http://www.example.com/awesome_wall-light/")
   }
 
   it should "replace duplicate / with a single /" in {
@@ -47,7 +50,10 @@ class WebUrlSpec extends FlatSpec {
     WebUrl.from("http://www.example.com/a/?jsessionid=123&a=2&b=3").resolve("http://www.example.com/new/path").toString should be("http://www.example.com/new/path")
   }
 
-  it should "cancnicalize weird urls" in {
-    (new URL("http://www.target.com/c/beauty-concierge-ways-to-shop-health/-/N-55md5#?lnk=snav_rd_beauty%20concierge&orginalSearchTerm=beauty+concierge||T:|C:")).toString should be("http://www.target.com/c/beauty-concierge-ways-to-shop-health/-/N-55md5#?lnk=snav_rd_beauty%20concierge&orginalSearchTerm=beauty+concierge||T:|C:")
+  it should "remove hash fragments #TODO: Really check if it causes any problems" in {
+    val url = "http://www.target.com/c/beauty-concierge-ways-to-shop-health/-/N-55md5#?lnk=snav_rd_beauty%20concierge&orginalSearchTerm=beauty+concierge||T:|C:"
+    val withoutFragments = "http://www.target.com/c/beauty-concierge-ways-to-shop-health/-/N-55md5"
+    WebUrl.from(url).toString should be(withoutFragments)
   }
+
 }

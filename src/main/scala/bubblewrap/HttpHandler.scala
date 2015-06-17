@@ -39,7 +39,6 @@ class HttpHandler(config:CrawlConfig, url: WebUrl) extends AsyncHandler[Unit]{
 
   override def onHeadersReceived(httpResponseHeaders: HttpResponseHeaders): STATE = {
     headers = new ResponseHeaders(httpResponseHeaders)
-    headers.contentCharset.foreach(body.useCharset)
     if(headers.exceedsSize(config.maxSize)) {
       httpResponse.success(HttpResponse(statusCode, FailureResponse(ExceededSize(config.maxSize)), headers, responseTime))
       return STATE.ABORT

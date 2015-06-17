@@ -7,9 +7,9 @@ import org.jsoup.nodes.{Document, Element}
 
 import scala.collection.JavaConversions._
 
-case class Content(url: WebUrl, content: String, contentType: Option[String] = None, contentCharset: Option[String] = None,  contentEncoding: Option[String] = None) {
-  def asString = content
-  def asBytes = content.getBytes(contentCharset.getOrElse("UTF-8"))
+case class Content(url: WebUrl, content: Array[Byte], contentType: Option[String] = None, contentCharset: Option[String] = None,  contentEncoding: Option[String] = None) {
+  def asString = new String(content,contentCharset.getOrElse("UTF-8"))
+  def asBytes = content
   def length = content.length
 }
 case class Page(content:Content,
@@ -23,7 +23,7 @@ case class Page(content:Content,
 }
 
 object Content{
-  def apply(url: WebUrl, body: String, responseHeaders: ResponseHeaders): Content = {
+  def apply(url: WebUrl, body: Array[Byte], responseHeaders: ResponseHeaders): Content = {
     Content(url, body,responseHeaders.contentEncoding, responseHeaders.contentCharset, responseHeaders.contentType)
   }
 }
@@ -31,6 +31,7 @@ object Content{
 
 class PageParser {
   val MetaUrl = "(?i)[^;]*;\\s*URL\\s*=(.*)".r
+  val NOFOLLOW = "(?i).*nofollow.*"
   def parse(content: Content) = {
     val doc = Jsoup.parse(content.asString)
     Page(content, metaRefresh(content.url, doc), canonicalUrl(content.url, doc), outgoingLinks = outgoingLinks(content.url, doc))
@@ -51,10 +52,17 @@ class PageParser {
       .map(element => baseUrl.resolve(element.attr("href")))
   }
 
-  private def outgoingLinks(baseUrl:WebUrl, doc: Document) = {
+  private def outgoingLinks(baseUrl:WebUrl, doc: Document): List[WebUrl] = {
+    if(noFollow(doc)) return List.empty
     (doc.getElementsByTag("a") ++ doc.getElementsByTag("link"))
       .flatMap{ element => extractLink(baseUrl, element) }
       .toList
+  }
+
+  private def noFollow(doc: Document) = {
+    doc.getElementsByAttributeValue("name", "robots")
+      .headOption
+      .exists(element => element.attr("content").matches(NOFOLLOW))
   }
 
   private def extractLink(baseUrl:WebUrl, elem: Element) = {
