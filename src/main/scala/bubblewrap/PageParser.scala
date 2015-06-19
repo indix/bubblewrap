@@ -32,6 +32,7 @@ object Content{
 class PageParser {
   val MetaUrl = "(?i)[^;]*;\\s*URL\\s*=(.*)".r
   val NOFOLLOW = "(?i).*nofollow.*"
+  val urlFilterProtocols = List("javascript:", "mailto:", "@", "tel:")
   def parse(content: Content) = {
     val doc = Jsoup.parse(content.asString)
     Page(content, metaRefresh(content.url, doc), canonicalUrl(content.url, doc), outgoingLinks = outgoingLinks(content.url, doc))
@@ -69,7 +70,7 @@ class PageParser {
     val href = elem.attr("href")
     val shouldFollow = elem.attr("rel") != "nofollow"
     val isCanonical = elem.attr("rel") == "canonical"
-    val isWebPageLink = !(href.contains("javascript:") || href.contains("mailto:") || href.contains("@"))
+    val isWebPageLink = !urlFilterProtocols.exists(filter => href.contains(filter))
     if(isWebPageLink && shouldFollow && !isCanonical) Some(baseUrl.resolve(href)) else None
   }
 }
