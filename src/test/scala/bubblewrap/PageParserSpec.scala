@@ -73,6 +73,7 @@ class PageParserSpec extends FlatSpec {
         |<a href="ios-app:http://itunes.com/app"/>
         |<a href="data:=3A232221wec"/>
         |<a href="feed:<xml id=abc/>"/>
+        |<a href="skype:user_id"/>
         |</html>""".stripMargin
 
     PageParser().parse(Content(WebUrl("http://www.example.com"), html.getBytes())).outgoingLinks should be(List.empty)

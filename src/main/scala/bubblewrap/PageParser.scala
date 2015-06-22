@@ -32,7 +32,7 @@ object Content{
 class PageParser {
   val MetaUrl = "(?i)[^;]*;\\s*URL\\s*=(.*)".r
   val NOFOLLOW = "(?i).*nofollow.*"
-  val urlFilters = "(?i)^(javascript|mailto|callto|tel|android-app|ios-app|data|feed):.*|.*@.*"
+  val urlFilters = "(?i)^(javascript|mailto|callto|tel|android-app|ios-app|data|feed|skype):.*|.*@.*"
   def parse(content: Content) = {
     val doc = Jsoup.parse(content.asString)
     Page(content, metaRefresh(content.url, doc), canonicalUrl(content.url, doc), outgoingLinks = outgoingLinks(content.url, doc))
