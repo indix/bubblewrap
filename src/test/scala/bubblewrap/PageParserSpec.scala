@@ -62,7 +62,18 @@ class PageParserSpec extends FlatSpec {
   }
 
   it should "extract outgoing links from a and link tags ignoring non-webpage-links" in {
-    val html = """<html><a href="javascript:var x=5;"/><a href="mailto:a@a.com"/><a href="b@b.com"/></html>"""
+    val html =
+      """<html>
+        |<a href="javascript:var x=5;"/>
+        |<a href="Javascript:var x=5;"/>
+        |<a href="mailto:a.com"/>
+        |<a href="callto:224332"/>
+        |<a href="tel:2234332"/>
+        |<a href="android-app:http://play.com/app"/>
+        |<a href="ios-app:http://itunes.com/app"/>
+        |<a href="data:=3A232221wec"/>
+        |</html>""".stripMargin
+
     PageParser().parse(Content(WebUrl("http://www.example.com"), html.getBytes())).outgoingLinks should be(List.empty)
   }
 
