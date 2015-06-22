@@ -32,7 +32,8 @@ object Content{
 class PageParser {
   val MetaUrl = "(?i)[^;]*;\\s*URL\\s*=(.*)".r
   val NOFOLLOW = "(?i).*nofollow.*"
-  val urlFilters = "(?i)^(javascript|mailto|callto|tel|android-app|ios-app|data|feed|skype):.*|.*@.*"
+  val SCHEME = "([A-Za-z-]+):.*".r
+  val schemes = Set("http","https")
   def parse(content: Content) = {
     val doc = Jsoup.parse(content.asString)
     Page(content, metaRefresh(content.url, doc), canonicalUrl(content.url, doc), outgoingLinks = outgoingLinks(content.url, doc))
@@ -70,8 +71,15 @@ class PageParser {
     val href = elem.attr("href")
     val shouldFollow = elem.attr("rel") != "nofollow"
     val isCanonical = elem.attr("rel") == "canonical"
-    val isWebPageLink = !href.matches(urlFilters)
+    val isWebPageLink = allowedSchemes(href) && notHasIllegalCharacters(href)
     if(isWebPageLink && shouldFollow && !isCanonical) Some(baseUrl.resolve(href)) else None
+  }
+
+  private def notHasIllegalCharacters(href:String) = !href.contains("@")
+
+  private def allowedSchemes(href:String) = href match {
+    case SCHEME(scheme) => schemes contains scheme.trim.toLowerCase
+    case _ => true
   }
 }
 
