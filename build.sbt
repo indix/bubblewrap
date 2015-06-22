@@ -5,7 +5,7 @@ val jsoup = "org.jsoup" % "jsoup" % "1.8.1"
 val mockito = "org.mockito" % "mockito-all" % "1.9.5" % Test
 val scalatest = "org.scalatest" %% "scalatest" % "2.2.4" % Test
 
-val appVersion = sys.env.getOrElse("SNAP_PIPELINE_COUNTER", "2.16")
+val appVersion = sys.env.getOrElse("SNAP_PIPELINE_COUNTER", "1.0.0-SNAPSHOT")
 
 lazy val commonSettings = Seq(
   organization := "com.indix",
