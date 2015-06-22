@@ -1,7 +1,9 @@
+val appVersion = sys.env.getOrElse("SNAP_PIPELINE_COUNTER", "1.0.0-SNAPSHOT")
+
 lazy val root = (project in file(".")).
   settings(
     name := "bubblewrap",
-    version := "1.0",
+    version := appVersion,
     scalaVersion := "2.10.4"
   )
 
