@@ -1,6 +1,7 @@
 val asyncHttpClient =  "com.ning" % "async-http-client" % "1.9.24"
 val commonsIo = "commons-io" % "commons-io" % "2.4"
 val jsoup = "org.jsoup" % "jsoup" % "1.8.1"
+val tika = "org.apache.tika" % "tika-core" % "1.4"
 
 val mockito = "org.mockito" % "mockito-all" % "1.9.5" % Test
 val scalatest = "org.scalatest" %% "scalatest" % "2.2.4" % Test
@@ -18,7 +19,7 @@ lazy val commonSettings = Seq(
   scalacOptions ++= Seq("-encoding", "UTF-8", "-deprecation", "-unchecked"),
   javacOptions ++= Seq("-Xlint:deprecation", "-source", "1.7"),
   libraryDependencies ++= Seq(
-    asyncHttpClient, commonsIo, jsoup, mockito, scalatest
+    asyncHttpClient, commonsIo, jsoup, mockito, scalatest, tika
   ),
   publishMavenStyle := true,
   publishTo := {
