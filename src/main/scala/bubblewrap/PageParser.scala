@@ -36,8 +36,6 @@ class PageParser {
   val SCHEME = "([A-Za-z-]+):.*".r
   val schemes = Set("http","https")
   def parse(content: Content): Page = {
-    val contentType = new Tika().detect(content.asBytes)
-    if(contentType != "text/html") return Page(content)
     val doc = Jsoup.parse(content.asString)
     Page(content, metaRefresh(content.url, doc), canonicalUrl(content.url, doc), outgoingLinks = outgoingLinks(content.url, doc))
   }
