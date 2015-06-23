@@ -4,6 +4,7 @@ import java.net.URL
 import java.security.cert.X509Certificate
 import javax.net.ssl.{SSLContext, X509TrustManager}
 
+import com.ning.http.client.Realm.AuthScheme
 import com.ning.http.client._
 import com.ning.http.client.cookie.Cookie
 import org.jboss.netty.handler.codec.http.HttpHeaders.Names._
@@ -27,14 +28,28 @@ class HttpClient(clientSettings:ClientSettings = new ClientSettings()) {
                                       .setConnectionTimeOut(clientSettings.connectionTimeout)
                                       .setReadTimeout(clientSettings.socketTimeout)
                                       .setSslContext(lenientSSLContext)
+                                      .setFollowRedirect(false)
   )
+
+  def realmFrom(config: ProxyWithAuth): Realm = {
+    new Realm.RealmBuilder()
+      .setPrincipal(config.user)
+      .setPassword(config.pass)
+      .setUsePreemptiveAuth(true)
+      .setScheme(AuthScheme.BASIC)
+      .setTargetProxy(true)
+      .build()
+  }
 
   def get(url: WebUrl, config:CrawlConfig) = {
     val handler = new HttpHandler(config, url)
     val request = client.prepareGet(url.toString)
     config.proxy.foreach{
       case PlainProxy(host, port) => request.setProxyServer(new ProxyServer(host,port))
-      case ProxyWithAuth(host, port, user, pass) => request.setProxyServer(new ProxyServer(host, port, user, pass))
+      case proxy@ProxyWithAuth(host, port, user, pass) => {
+        request.setRealm(realmFrom(proxy))
+        request.setProxyServer(new ProxyServer(host, port, user, pass))
+      }
     }
     request
       .addHeader(ACCEPT, "*/*")
