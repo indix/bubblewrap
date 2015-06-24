@@ -38,4 +38,12 @@ class ResponseHeadersSpec extends FlatSpec {
 
     headers.contentCharset should be(Some("EUC-JP"))
   }
+
+  it should "parse out content encoding optionally enclosed in quotes" in {
+    val headers: ResponseHeaders = new ResponseHeaders(new HttpResponseHeaders() {
+      override def getHeaders = new FluentCaseInsensitiveStringsMap().add("Content-Type", "text/xml; charset=\"UTF-8\"")
+    })
+
+    headers.contentCharset should be(Some("UTF-8"))
+  }
 }
