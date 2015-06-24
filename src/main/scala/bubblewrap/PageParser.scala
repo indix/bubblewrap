@@ -2,7 +2,6 @@ package bubblewrap
 
 import java.util.regex.Pattern
 
-import org.apache.tika.Tika
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 
@@ -33,7 +32,7 @@ object Content{
 class PageParser {
   val MetaUrl = "(?i)[^;]*;\\s*URL\\s*=(.*)".r
   val NOFOLLOW = "(?i).*nofollow.*"
-  val SCHEME = "([A-Za-z-]+):.*".r
+  val SCHEME = "([^:]+):.*".r
   val schemes = Set("http","https")
   def parse(content: Content): Page = {
     val doc = Jsoup.parse(content.asString)
@@ -69,10 +68,11 @@ class PageParser {
   }
 
   private def extractLink(baseUrl:WebUrl, elem: Element) = {
-    val href = elem.attr("href")
+    val href = elem.attr("href").trim
     val shouldFollow = elem.attr("rel") != "nofollow"
     val isCanonical = elem.attr("rel") == "canonical"
     val isWebPageLink = allowedSchemes(href) && notHasIllegalCharacters(href)
+    println(href)
     if(isWebPageLink && shouldFollow && !isCanonical) Some(baseUrl.resolve(href)) else None
   }
 
