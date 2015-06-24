@@ -2,7 +2,6 @@ package bubblewrap
 
 import java.util.regex.Pattern
 
-import org.apache.tika.Tika
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 
@@ -35,10 +34,7 @@ class PageParser {
   val NOFOLLOW = "(?i).*nofollow.*"
   val SCHEME = "([^:]+):.*".r
   val schemes = Set("http","https")
-  val tika = new Tika()
   def parse(content: Content): Page = {
-    val contentType = tika.detect(content.asBytes)
-    if(!contentType.toLowerCase.contains("html")) return Page(content)
     val doc = Jsoup.parse(content.asString)
     Page(content, metaRefresh(content.url, doc), canonicalUrl(content.url, doc), outgoingLinks = outgoingLinks(content.url, doc))
   }

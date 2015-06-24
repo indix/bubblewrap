@@ -83,11 +83,4 @@ class PageParserSpec extends FlatSpec {
     val html = """<html><meta name="robots" content="noodp,noydir,nofollow" /><link href="http://www.example.com/link"/><a href="http://www.example.com/a"/></html>"""
     PageParser().parse(Content(WebUrl("http://www.example.com"), html.getBytes())).outgoingLinks should be(List.empty)
   }
-
-  it should "not parse page for non-html" in {
-    val nonHtml = "non-html"
-    val page = PageParser().parse(Content(WebUrl("http://www.example.com"), nonHtml.getBytes()))
-    page.outgoingLinks should be(List.empty)
-    page.metaRefresh should be(None)
-  }
 }
