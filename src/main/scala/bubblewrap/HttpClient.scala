@@ -27,6 +27,7 @@ class HttpClient(clientSettings:ClientSettings = new ClientSettings()) {
   val client = new AsyncHttpClient(new AsyncHttpClientConfigBean()
                                       .setConnectionTimeOut(clientSettings.connectionTimeout)
                                       .setReadTimeout(clientSettings.socketTimeout)
+                                      .setAllowPoolingConnection(clientSettings.poolConnections)
                                       .setSslContext(lenientSSLContext)
                                       .setFollowRedirect(false)
   )
