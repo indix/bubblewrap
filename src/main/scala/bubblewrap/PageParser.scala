@@ -72,7 +72,6 @@ class PageParser {
     val shouldFollow = elem.attr("rel") != "nofollow"
     val isCanonical = elem.attr("rel") == "canonical"
     val isWebPageLink = allowedSchemes(href) && notHasIllegalCharacters(href)
-    println(href)
     if(isWebPageLink && shouldFollow && !isCanonical) Some(baseUrl.resolve(href)) else None
   }
 
