@@ -2,7 +2,7 @@ package bubblewrap
 
 import java.net.URL
 import java.security.cert.X509Certificate
-import javax.net.ssl.{SSLContext, X509TrustManager}
+import javax.net.ssl.{SSLSession, HostnameVerifier, SSLContext, X509TrustManager}
 
 import com.ning.http.client.Realm.AuthScheme
 import com.ning.http.client._
@@ -23,12 +23,17 @@ class HttpClient(clientSettings:ClientSettings = new ClientSettings()) {
     ), null)
     context
   }
+
+  val allHostsValid = new HostnameVerifier {
+    override def verify(s: String, sslSession: SSLSession): Boolean = true
+  }
   
   val client = new AsyncHttpClient(new AsyncHttpClientConfigBean()
                                       .setConnectionTimeOut(clientSettings.connectionTimeout)
                                       .setReadTimeout(clientSettings.socketTimeout)
                                       .setAllowPoolingConnection(clientSettings.poolConnections)
                                       .setSslContext(lenientSSLContext)
+                                      .setHostnameVerifier(allHostsValid)
                                       .setFollowRedirect(false)
   )
 
