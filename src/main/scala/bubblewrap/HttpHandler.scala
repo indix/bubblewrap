@@ -1,6 +1,8 @@
 package bubblewrap
 
 
+import java.util.concurrent.TimeoutException
+
 import com.ning.http.client.AsyncHandler.STATE
 import com.ning.http.client._
 
@@ -15,8 +17,15 @@ class HttpHandler(config:CrawlConfig, url: WebUrl) extends AsyncHandler[Unit]{
   })
   val startTime = System.currentTimeMillis()
   val UNKNOWN_ERROR = 1006
+  val TIMEOUT_ERROR = 9999
 
-  override def onThrowable(error: Throwable) = httpResponse.success(HttpResponse(UNKNOWN_ERROR, FailureResponse(error), headers, responseTime))
+  private def errorCode(error: Throwable) = error match {
+    case timeout:TimeoutException => TIMEOUT_ERROR
+    case other => UNKNOWN_ERROR
+  }
+
+  override def onThrowable(error: Throwable) = httpResponse.success(HttpResponse(errorCode(error), FailureResponse(error), headers, responseTime))
+
 
   override def onCompleted(): Unit = {
     httpResponse.success(HttpResponse(statusCode, SuccessResponse(Content(url, body.content, headers)), headers, responseTime))

@@ -1,5 +1,7 @@
 package bubblewrap
 
+import java.util.concurrent.TimeoutException
+
 import bubblewrap.TestUtils._
 import com.ning.http.client.AsyncHandler.STATE
 import com.ning.http.client.{FluentCaseInsensitiveStringsMap, HttpResponseBodyPart, HttpResponseHeaders, HttpResponseStatus}
@@ -108,5 +110,22 @@ class HttpHandlerSpec extends FlatSpec with Inside{
       case SuccessResponse(content) => content.asString should be(koreanString)
       case _ => fail("Did not produce expected success response")
     }
+  }
+
+  it should "use timeout error code when reporting connection and read timeouts" in {
+    val handler = new HttpHandler(config, url)
+    val response = handler.httpResponse.future
+
+    handler.onThrowable(new TimeoutException("read timeout"))
+    get(response).status should be(9999)
+  }
+
+
+  it should "use unknown error code when reporting exceptiosn which arent timeouts" in {
+    val handler = new HttpHandler(config, url)
+    val response = handler.httpResponse.future
+
+    handler.onThrowable(new RuntimeException("I dont know what went wrong, really")) 
+    get(response).status should be(1006)
   }
 }
