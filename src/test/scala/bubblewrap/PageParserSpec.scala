@@ -74,6 +74,8 @@ class PageParserSpec extends FlatSpec {
         |<a href="data:=3A232221wec"/>
         |<a href="feed:<xml id=abc/>"/>
         |<a href="skype:user_id"/>
+        |<a href="javascipt: user_id =
+        |test"/>
         |</html>""".stripMargin
 
     PageParser().parse(Content(WebUrl("http://www.example.com"), html.getBytes())).outgoingLinks should be(List.empty)

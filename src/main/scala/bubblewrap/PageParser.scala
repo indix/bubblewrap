@@ -32,7 +32,7 @@ object Content{
 class PageParser {
   val MetaUrl = "(?i)[^;]*;\\s*URL\\s*=(.*)".r
   val NOFOLLOW = "(?i).*nofollow.*"
-  val SCHEME = "([^:]+):.*".r
+  val SCHEME = "(?s)([^:]+):.*".r
   val schemes = Set("http","https")
   def parse(content: Content): Page = {
     val doc = Jsoup.parse(content.asString)
