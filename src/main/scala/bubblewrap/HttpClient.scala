@@ -34,6 +34,7 @@ class HttpClient(clientSettings:ClientSettings = new ClientSettings()) {
                                       .setAllowPoolingConnection(clientSettings.poolConnections)
                                       .setSslContext(lenientSSLContext)
                                       .setHostnameVerifier(allHostsValid)
+                                      .setMaxRequestRetry(clientSettings.retries)
                                       .setFollowRedirect(false)
   )
 
