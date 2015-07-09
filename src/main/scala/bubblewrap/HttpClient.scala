@@ -35,8 +35,7 @@ class HttpClient(clientSettings:ClientSettings = new ClientSettings()) {
                                       .setSslContext(lenientSSLContext)
                                       .setHostnameVerifier(allHostsValid)
                                       .setMaxRequestRetry(clientSettings.retries)
-                                      .setFollowRedirect(false)
-  )
+                                      .setFollowRedirect(false))
 
   def realmFrom(config: ProxyWithAuth): Realm = {
     new Realm.RealmBuilder()

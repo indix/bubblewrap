@@ -1,6 +1,7 @@
 package bubblewrap
 
 
+import java.io.IOException
 import java.util.concurrent.TimeoutException
 
 import com.ning.http.client.AsyncHandler.STATE
@@ -18,9 +19,11 @@ class HttpHandler(config:CrawlConfig, url: WebUrl) extends AsyncHandler[Unit]{
   val startTime = System.currentTimeMillis()
   val UNKNOWN_ERROR = 1006
   val TIMEOUT_ERROR = 9999
+  val REMOTE_CLOSE = 9998
 
   private def errorCode(error: Throwable) = error match {
     case timeout:TimeoutException => TIMEOUT_ERROR
+    case other:IOException if other.getMessage.contains("Remotely closed") => REMOTE_CLOSE
     case other => UNKNOWN_ERROR
   }
 
