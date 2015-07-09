@@ -1,5 +1,6 @@
 package bubblewrap
 
+import java.io.IOException
 import java.util.concurrent.TimeoutException
 
 import bubblewrap.TestUtils._
@@ -127,5 +128,14 @@ class HttpHandlerSpec extends FlatSpec with Inside{
 
     handler.onThrowable(new RuntimeException("I dont know what went wrong, really")) 
     get(response).status should be(1006)
+  }
+
+
+  it should "use remotely closed error code when reporting ioexception with remotely closed as message" in {
+    val handler = new HttpHandler(config, url)
+    val response = handler.httpResponse.future
+
+    handler.onThrowable(new IOException("Remotely closed"))
+    get(response).status should be(9998)
   }
 }
