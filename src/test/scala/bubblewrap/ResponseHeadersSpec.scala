@@ -46,4 +46,17 @@ class ResponseHeadersSpec extends FlatSpec {
 
     headers.contentCharset should be(Some("UTF-8"))
   }
+
+  it should "give out headers as map" in {
+    val headers: ResponseHeaders = new ResponseHeaders(new HttpResponseHeaders() {
+      override def getHeaders = new FluentCaseInsensitiveStringsMap()
+                                        .add("Content-Type", "text/xml; charset=\"UTF-8\"")
+                                        .add("X-Custom-Header", "Custom value")
+    })
+
+    headers.headers should be(Map(
+      "Content-Type" -> List("text/xml; charset=\"UTF-8\""),
+      "X-Custom-Header" -> List("Custom value")
+    ))
+  }
 }

@@ -14,4 +14,5 @@ class ResponseHeaders(httpResponseHeaders: HttpResponseHeaders) {
   }
   def contentType = httpResponseHeaders.getHeaders.get("Content-Type").headOption
   def contentEncoding = httpResponseHeaders.getHeaders.get("Content-Encoding").headOption
+  def headers:Map[String,List[String]] = httpResponseHeaders.getHeaders.iterator().map(t => t.getKey -> t.getValue.toList).toMap
 }
