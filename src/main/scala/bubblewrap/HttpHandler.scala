@@ -33,7 +33,7 @@ class HttpHandler(config:CrawlConfig, url: WebUrl) extends AsyncHandler[Unit]{
 
   override def onCompleted(): Unit = {
     val content = Content(url, body.content, headers)
-    if (content.contentLength <= config.minSize) statusCode = CAPTCHA_CONTENT
+    if (content.contentLength <= config.minSize && statusCode == 200) statusCode = CAPTCHA_CONTENT
     httpResponse.success(HttpResponse(statusCode, SuccessResponse(content), headers, responseTime))
   }
 
