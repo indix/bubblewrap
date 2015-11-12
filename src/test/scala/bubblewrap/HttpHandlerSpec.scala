@@ -12,7 +12,7 @@ import org.scalatest.Inside
 import org.scalatest.Matchers.{be, convertToAnyShouldWrapper}
 
 class HttpHandlerSpec extends FlatSpec with Inside{
-  val config: CrawlConfig = CrawlConfig(None, "bubblewrap", 1000, Cookies.None)
+  val config: CrawlConfig = CrawlConfig(None, "bubblewrap", 1000, 5, Cookies.None)
   val url = WebUrl("http://www.example.com/1")
 
   def httpStatus(code:Int) = {
@@ -122,7 +122,7 @@ class HttpHandlerSpec extends FlatSpec with Inside{
   }
 
 
-  it should "use unknown error code when reporting exceptiosn which arent timeouts" in {
+  it should "use unknown error code when reporting exceptions which arent timeouts" in {
     val handler = new HttpHandler(config, url)
     val response = handler.httpResponse.future
 
@@ -137,5 +137,19 @@ class HttpHandlerSpec extends FlatSpec with Inside{
 
     handler.onThrowable(new IOException("Remotely closed"))
     get(response).status should be(9998)
+  }
+
+  it should "use captcha error code when content length is smaller than captcha content length" in {
+    val handler = new HttpHandler(config, url)
+    val response = handler.httpResponse.future
+    handler.onStatusReceived(httpStatus(200))
+
+    handler.onHeadersReceived(httpHeaders()) should be(STATE.CONTINUE)
+    handler.onBodyPartReceived(bodyPart("small".getBytes)) should be(STATE.CONTINUE)
+
+    handler.onCompleted()
+
+    response.isCompleted should be(true)
+    get(response).status should be(9997)
   }
 }

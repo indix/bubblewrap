@@ -11,6 +11,7 @@ case class Content(url: WebUrl, content: Array[Byte], contentType: Option[String
   def asString = new String(content,contentCharset.getOrElse("UTF-8"))
   def asBytes = content
   def length = content.length
+  def contentLength = asString.length
 }
 case class Page(content:Content,
                 metaRefresh:Option[WebUrl] = None,

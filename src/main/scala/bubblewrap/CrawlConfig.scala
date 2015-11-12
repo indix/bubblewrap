@@ -1,6 +1,6 @@
 package bubblewrap
 
-case class CrawlConfig(proxy:Option[Proxy], userAgent:String, maxSize: Long, cookies:Cookies = Cookies None, customHeaders: RequestHeaders = RequestHeaders None)
+case class CrawlConfig(proxy:Option[Proxy], userAgent:String, maxSize: Long, minSize: Long, cookies:Cookies = Cookies None, customHeaders: RequestHeaders = RequestHeaders None)
 case class RequestHeaders(headers: Map[String,String]) {
   def +(header:(String,String)) = this.copy(headers + header)
 }

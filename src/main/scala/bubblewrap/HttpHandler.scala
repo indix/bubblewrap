@@ -20,6 +20,7 @@ class HttpHandler(config:CrawlConfig, url: WebUrl) extends AsyncHandler[Unit]{
   val UNKNOWN_ERROR = 1006
   val TIMEOUT_ERROR = 9999
   val REMOTE_CLOSE = 9998
+  val CAPTCHA_CONTENT = 9997
 
   private def errorCode(error: Throwable) = error match {
     case timeout:TimeoutException => TIMEOUT_ERROR
@@ -31,7 +32,9 @@ class HttpHandler(config:CrawlConfig, url: WebUrl) extends AsyncHandler[Unit]{
 
 
   override def onCompleted(): Unit = {
-    httpResponse.success(HttpResponse(statusCode, SuccessResponse(Content(url, body.content, headers)), headers, responseTime))
+    val content = Content(url, body.content, headers)
+    if (content.contentLength <= config.minSize) statusCode = CAPTCHA_CONTENT
+    httpResponse.success(HttpResponse(statusCode, SuccessResponse(content), headers, responseTime))
   }
 
   override def onBodyPartReceived(bodyPart: HttpResponseBodyPart): STATE = {
