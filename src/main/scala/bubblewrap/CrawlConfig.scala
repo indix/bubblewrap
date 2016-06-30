@@ -7,7 +7,8 @@ case class RequestHeaders(headers: Map[String,String]) {
 object RequestHeaders {
   def None = RequestHeaders(Map.empty)
 }
-case class ClientSettings(socketTimeout:Int = 20000, connectionTimeout:Int = 30000, maxConnectionPerHost:Int = 16,
+case class ClientSettings(socketTimeout:Int = 20000, connectionTimeout:Int = 30000, requestTimeout:Int = 60000,
+                          readTimeout:Int = 60000, maxConnectionPerHost:Int = 16,
                           maxTotalConnections:Int = 128, poolConnections:Boolean = true, retries:Int = 0)
 case class Cookies(cookies:Map[String,String])
 object Cookies {
