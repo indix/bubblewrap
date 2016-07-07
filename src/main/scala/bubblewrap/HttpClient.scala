@@ -45,7 +45,7 @@ class HttpClient(clientSettings:ClientSettings = new ClientSettings()) {
       .setPrincipal(config.user)
       .setPassword(config.pass)
       .setUsePreemptiveAuth(true)
-      .setScheme(AuthScheme.BASIC)
+      .setScheme(AuthScheme.NTLM)
       .setTargetProxy(true)
       .build()
   }
@@ -57,7 +57,6 @@ class HttpClient(clientSettings:ClientSettings = new ClientSettings()) {
       case PlainProxy(host, port) => request.setProxyServer(new ProxyServer(host,port))
       case proxy@ProxyWithAuth(host, port, user, pass) => {
         request.setRealm(realmFrom(proxy))
-
         request.setProxyServer(new ProxyServer(host, port, user, pass))
       }
     }
