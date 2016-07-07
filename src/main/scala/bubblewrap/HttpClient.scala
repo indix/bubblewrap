@@ -35,6 +35,7 @@ class HttpClient(clientSettings:ClientSettings = new ClientSettings()) {
                                       .setReadTimeout(clientSettings.socketTimeout)
                                       .setAllowPoolingConnection(clientSettings.poolConnections)
                                       .setSslContext(lenientSSLContext)
+                                      .setAcceptAnyCertificate(true)
                                       .setHostnameVerifier(allHostsValid)
                                       .setMaxRequestRetry(clientSettings.retries)
                                       .setFollowRedirect(false))
@@ -56,6 +57,7 @@ class HttpClient(clientSettings:ClientSettings = new ClientSettings()) {
       case PlainProxy(host, port) => request.setProxyServer(new ProxyServer(host,port))
       case proxy@ProxyWithAuth(host, port, user, pass) => {
         request.setRealm(realmFrom(proxy))
+
         request.setProxyServer(new ProxyServer(host, port, user, pass))
       }
     }
