@@ -34,6 +34,7 @@ class HttpClient(clientSettings:ClientSettings = new ClientSettings()) {
                                       .setReadTimeout(clientSettings.readTimeout)
                                       .setReadTimeout(clientSettings.socketTimeout)
                                       .setAllowPoolingConnection(clientSettings.poolConnections)
+                                      .setAllowSslConnectionPool(clientSettings.poolConnections)
                                       .setSslContext(lenientSSLContext)
                                       .setAcceptAnyCertificate(true)
                                       .setHostnameVerifier(allHostsValid)
