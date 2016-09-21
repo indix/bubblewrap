@@ -46,7 +46,7 @@ class HttpClient(clientSettings:ClientSettings = new ClientSettings()) {
       .setPrincipal(config.user)
       .setPassword(config.pass)
       .setUsePreemptiveAuth(true)
-      .setScheme(AuthScheme.NTLM)
+      .setScheme(AuthScheme.NONE)
       .setTargetProxy(true)
       .build()
   }
