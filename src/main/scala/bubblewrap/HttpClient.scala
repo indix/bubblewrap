@@ -77,7 +77,7 @@ object HttpClient {
   val oneYear = 360l * 24 * 60 * 60 * 1000
   def cookies(config:CrawlConfig, url:String) = {
     config.cookies.cookies
-      .map(cookie => Cookie.newValidCookie(cookie._1,cookie._2, false, host(url),"/", oneYear, 360 , url.startsWith("https"),true))
+      .map(cookie => Cookie.newValidCookie(cookie._1,cookie._2, false, host(url),"/", 360 , url.startsWith("https"),true))
       .toList
   }
   def host(url:String) = new URL(url).getHost
