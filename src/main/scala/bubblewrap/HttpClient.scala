@@ -2,9 +2,8 @@ package bubblewrap
 
 import java.net.URL
 import java.security.cert.X509Certificate
-import javax.net.ssl.{SSLSession, HostnameVerifier, SSLContext, X509TrustManager}
+import javax.net.ssl.{HostnameVerifier, SSLContext, SSLSession, X509TrustManager}
 
-import com.ning.http.client.Realm.AuthScheme
 import com.ning.http.client._
 import com.ning.http.client.cookie.Cookie
 import org.jboss.netty.handler.codec.http.HttpHeaders.Names._
@@ -46,7 +45,7 @@ class HttpClient(clientSettings:ClientSettings = new ClientSettings()) {
       .setPrincipal(config.user)
       .setPassword(config.pass)
       .setUsePreemptiveAuth(true)
-      .setScheme(AuthScheme.NONE)
+      .setScheme(config.authScheme.toNingScheme)
       .setTargetProxy(true)
       .build()
   }
@@ -56,7 +55,7 @@ class HttpClient(clientSettings:ClientSettings = new ClientSettings()) {
     val request = client.prepareGet(url.toString)
     config.proxy.foreach{
       case PlainProxy(host, port) => request.setProxyServer(new ProxyServer(host,port))
-      case proxy@ProxyWithAuth(host, port, user, pass) => {
+      case proxy@ProxyWithAuth(host, port, user, pass, scheme) => {
         request.setRealm(realmFrom(proxy))
         request.setProxyServer(new ProxyServer(host, port, user, pass))
       }

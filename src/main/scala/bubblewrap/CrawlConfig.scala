@@ -1,5 +1,7 @@
 package bubblewrap
 
+import com.ning.http.client.Realm
+
 case class CrawlConfig(proxy:Option[Proxy], userAgent:String, maxSize: Long, minSize: Long, cookies:Cookies = Cookies None, customHeaders: RequestHeaders = RequestHeaders None)
 case class RequestHeaders(headers: Map[String,String]) {
   def +(header:(String,String)) = this.copy(headers + header)
@@ -27,13 +29,29 @@ case class HttpResponse(status: Int, pageResponse: PageResponse, headers: Respon
   def contentType = headers.contentType
 }
 
+sealed trait AuthScheme {
+  def toNingScheme: Realm.AuthScheme
+}
+case object BASIC extends AuthScheme {
+  def toNingScheme = Realm.AuthScheme.BASIC
+}
+case object NTLM extends AuthScheme {
+  def toNingScheme = Realm.AuthScheme.NTLM
+}
+
+object AuthScheme {
+  def apply(value: String): AuthScheme = if(value == "ntlm") NTLM else BASIC
+}
+
+
 sealed trait Proxy
 case class PlainProxy(host:String, port:Int) extends Proxy
-case class ProxyWithAuth(host:String, port:Int, user:String, pass:String) extends Proxy
+case class ProxyWithAuth(host:String, port:Int, user:String, pass:String, authScheme: AuthScheme) extends Proxy
 
 object Proxy {
   def apply(host:String, port:Int) = PlainProxy(host, port)
-  def apply(host:String, port:Int, user:String, pass:String) = ProxyWithAuth(host, port, user, pass)
+  def apply(host:String, port:Int, user:String, pass:String) = ProxyWithAuth(host, port, user, pass, BASIC)
+  def apply(host:String, port:Int, user:String, pass:String, authScheme: AuthScheme) = ProxyWithAuth(host, port, user, pass, authScheme)
 }
 
 
