@@ -61,7 +61,6 @@ class HttpClient(clientSettings:ClientSettings = new ClientSettings()) {
       }
     }
     request
-      .addHeader(ACCEPT, "*/*")
       .addHeader(ACCEPT_ENCODING, GZIP)
       .addHeader(USER_AGENT, config.userAgent)
       .setCookies(HttpClient.cookies(config,url.toString).asJava)
