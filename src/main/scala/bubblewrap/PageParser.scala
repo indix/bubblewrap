@@ -13,14 +13,31 @@ case class Content(url: WebUrl, content: Array[Byte], contentType: Option[String
   def length = content.length
   def contentLength = asString.length
 }
-case class Page(content:Content,
-                metaRefresh:Option[WebUrl] = None,
-                canonicalUrl:Option[WebUrl] = None,
-                outgoingLinks:List[WebUrl] = List.empty) {
+class Page(val content:Content) {
+  def metaRefresh:Option[WebUrl] = None
+  def canonicalUrl:Option[WebUrl] = None
+  def outgoingLinks:List[WebUrl] = List.empty
   def url = content.url
   def contentType = content.contentType
   def contentCharset = content.contentCharset
   def contentEncoding = content.contentEncoding
+}
+
+object Page {
+  def apply(content: Content,
+            metaRefresh: => Option[WebUrl] = None,
+            canonicalUrl: => Option[WebUrl] = None,
+            outgoingLinks: => List[WebUrl] = List.empty): Page = {
+    //Clean this up, did this too make as few changes to the API as possible
+    lazy val metaRefreshB = metaRefresh
+    lazy val canonicalUrlB = canonicalUrl
+    lazy val outgoingLinksB = outgoingLinks
+    new Page(content) {
+      override def metaRefresh = metaRefreshB
+      override def canonicalUrl = canonicalUrlB
+      override def outgoingLinks = outgoingLinksB
+    }
+  }
 }
 
 object Content{
