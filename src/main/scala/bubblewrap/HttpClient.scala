@@ -60,9 +60,8 @@ class HttpClient(clientSettings:ClientSettings = new ClientSettings()) {
         request.setProxyServer(new ProxyServer(host, port, user, pass))
       }
     }
-    request
-      .addHeader(ACCEPT_ENCODING, GZIP)
-      .addHeader(USER_AGENT, config.userAgent)
+    if(!config.customHeaders.headers.contains(ACCEPT_ENCODING)) request.addHeader(ACCEPT_ENCODING, GZIP)
+    request.addHeader(USER_AGENT, config.userAgent)
       .setCookies(HttpClient.cookies(config,url.toString).asJava)
 
     config.customHeaders.headers.foreach(header => request.addHeader(header._1, header._2))
