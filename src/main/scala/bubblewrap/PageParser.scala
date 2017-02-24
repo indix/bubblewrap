@@ -29,10 +29,13 @@ object Page {
             canonicalUrl: => Option[WebUrl] = None,
             outgoingLinks: => List[WebUrl] = List.empty): Page = {
     //Clean this up, did this too make as few changes to the API as possible
-    lazy val metaRefreshB = metaRefresh
-    lazy val canonicalUrlB = canonicalUrl
-    lazy val outgoingLinksB = outgoingLinks
+    val metaRefreshRef = metaRefresh
+    val canonicalUrlRef = canonicalUrl
+    val outgoingLinksRef = outgoingLinks
     new Page(content) {
+      lazy val metaRefreshB = metaRefreshRef
+      lazy val canonicalUrlB = canonicalUrlRef
+      lazy val outgoingLinksB = outgoingLinksRef
       override def metaRefresh = metaRefreshB
       override def canonicalUrl = canonicalUrlB
       override def outgoingLinks = outgoingLinksB
