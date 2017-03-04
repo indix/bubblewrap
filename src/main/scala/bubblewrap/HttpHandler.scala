@@ -3,6 +3,8 @@ package bubblewrap
 
 import java.io.IOException
 import java.util.concurrent.TimeoutException
+
+import io.netty.handler.codec.http.DefaultHttpHeaders
 import org.asynchttpclient.AsyncHandler.State
 import org.asynchttpclient.{AsyncHandler, HttpResponseBodyPart, HttpResponseHeaders, HttpResponseStatus}
 
@@ -12,7 +14,7 @@ class HttpHandler(config:CrawlConfig, url: WebUrl) extends AsyncHandler[Unit]{
   private[bubblewrap] var body = new ResponseBody
   var statusCode:Int = 200
   val httpResponse = Promise[HttpResponse]()
-  var headers: ResponseHeaders = _
+  var headers: ResponseHeaders = new ResponseHeaders(new HttpResponseHeaders(new DefaultHttpHeaders))
   val startTime = System.currentTimeMillis()
   val UNKNOWN_ERROR = 1006
   val TIMEOUT_ERROR = 9999

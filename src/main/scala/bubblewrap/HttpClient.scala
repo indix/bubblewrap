@@ -61,6 +61,10 @@ class HttpClient(clientSettings: ClientSettings = ClientSettings()) {
     })
     responseFuture
   }
+
+  def shutDown() = {
+    client.close()
+  }
 }
 
 object HttpClient {
