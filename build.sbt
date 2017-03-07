@@ -8,19 +8,24 @@ val scalatest = "org.scalatest" %% "scalatest" % "2.2.4" % Test
 
 val appVersion = sys.env.getOrElse("SNAP_PIPELINE_COUNTER", "1.0.0-SNAPSHOT")
 
+def parserCombinator(version:String) :Option[ModuleID] = version match {
+  case "2.11.8" => Some("org.scala-lang.modules" % "scala-parser-combinators_2.11" % "1.0.5")
+  case  _ => None
+}
+
 lazy val commonSettings = Seq(
   organization := "com.indix",
   organizationName := "Indix",
   organizationHomepage := Some(url("http://www.indix.com")),
   version := appVersion,
   scalaVersion := "2.10.4",
-  crossPaths := false,
+  crossScalaVersions := Seq("2.10.4", "2.11.8"),
   parallelExecution in This := false,
   scalacOptions ++= Seq("-encoding", "UTF-8", "-deprecation", "-unchecked"),
   javacOptions ++= Seq("-Xlint:deprecation", "-source", "1.7"),
   libraryDependencies ++= Seq(
     asyncHttpClient, commonsIo, jsoup, mockito, scalatest, tika
-  ),
+  ) ++ Seq(scalaVersion(parserCombinator).value).flatten,
   publishMavenStyle := true,
   publishTo := {
     val nexus = "https://oss.sonatype.org/"
