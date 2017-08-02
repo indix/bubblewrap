@@ -3,6 +3,7 @@ package bubblewrap
 
 import java.net.{URI, URL}
 
+import scala.annotation.tailrec
 import scala.util.parsing.combinator.RegexParsers
 
 
@@ -45,14 +46,18 @@ object WebUrl {
   def removeSessionIdQueries = (value: String) => value.split("&").filterNot(_.matches(sessionQuery)).mkString("&")
 
   def replaceOctets = {
-    def parse(value: String): String =
-      if (value.length < 3) value
-      else if (value.charAt(0) == '%' && isHex(value.drop(1).take(2))) {
-        val char = Integer.parseInt(value.drop(1).take(2), 16).toChar
-        if (hexCodesToReplace contains char) char + parse(value.substring(3)) else value.take(3).toUpperCase + parse(value.substring(3))
+    @tailrec
+    def parseInternal(value: String, sofar: StringBuilder): StringBuilder =
+      if (value.length < 3) sofar.append(value)
+      else if (value.charAt(0) == '%' && isHex(value.slice(1, 3))) {
+        val char = Integer.parseInt(value.slice(1, 3), 16).toChar
+        if (hexCodesToReplace contains char) parseInternal(value.substring(3), sofar.append(char)) else parseInternal(value.substring(3), sofar.append(value.take(3).toUpperCase))
       } else {
-        value.charAt(0) + parse(value.substring(1))
+        parseInternal(value.substring(1), sofar.append(value.charAt(0)))
       }
+
+    def parse(value: String): String = parseInternal(value, new StringBuilder).toString()
+
     parse _
   }
 
