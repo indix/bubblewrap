@@ -47,16 +47,16 @@ object WebUrl {
 
   def replaceOctets = {
     @tailrec
-    def parseInternal(value: String, sofar: String): String =
-      if (value.length < 3) sofar + value
-      else if (value.charAt(0) == '%' && isHex(value.drop(1).take(2))) {
-        val char = Integer.parseInt(value.drop(1).take(2), 16).toChar
-        if (hexCodesToReplace contains char) parseInternal(value.substring(3), sofar + char) else parseInternal(value.substring(3), sofar + value.take(3).toUpperCase)
+    def parseInternal(value: String, sofar: StringBuilder): StringBuilder =
+      if (value.length < 3) sofar.append(value)
+      else if (value.charAt(0) == '%' && isHex(value.slice(1, 3))) {
+        val char = Integer.parseInt(value.slice(1, 3), 16).toChar
+        if (hexCodesToReplace contains char) parseInternal(value.substring(3), sofar.append(char)) else parseInternal(value.substring(3), sofar.append(value.take(3).toUpperCase))
       } else {
-        parseInternal(value.substring(1), sofar + value.charAt(0))
+        parseInternal(value.substring(1), sofar.append(value.charAt(0)))
       }
 
-    def parse(value: String): String = parseInternal(value, "")
+    def parse(value: String): String = parseInternal(value, new StringBuilder).toString()
 
     parse _
   }
