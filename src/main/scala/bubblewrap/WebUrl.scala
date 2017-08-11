@@ -25,8 +25,12 @@ object WebUrl {
     val host = toLowercase(url.getHost)
     val path = (removeDuplicateSlashes andThen removeDotSegments andThen replaceOctets)(url.getPath)
     val query = Option(url.getQuery).map(removeSessionIdQueries)
+    // Had to resort to this since URL doesn't return Fragments, and URI which supports Fragments,
+    // doesn't like octets or invalid characters in URL.
+    val fragmentParts = urlString.split("#")
+    val fragment = if(fragmentParts.length > 1) "#" + fragmentParts.drop(1).mkString else ""
 
-    WebUrl(new URL(scheme, host, port, query.map(path + "?" + _).getOrElse(path)).toString)
+    WebUrl(new URL(scheme, host, port, query.map(path + "?" + _ ).getOrElse(path) + fragment).toString)
   }
 
   def raw(urlString: String) = WebUrl(urlString)
