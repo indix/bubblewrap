@@ -2,3 +2,6 @@ language: scala
 
 sbt_args: -no-colors -J-Xss2m
 
+after_success:
+  - "[ -n $TRAVIS_TAG ] && { sbt +publish; };"
+
