@@ -10,7 +10,7 @@ val appMajorVersion = "0.2."
 val appVersion = (sys.env.get("TRAVIS_TAG") orElse sys.env.get("TRAVIS_BUILD_NUMBER").map(appMajorVersion + _ + "-SNAPSHOT")).getOrElse("1.0.0-SNAPSHOT")
 
 def parserCombinator(version:String) :Option[ModuleID] = version match {
-  case "2.11.8" => Some("org.scala-lang.modules" % "scala-parser-combinators_2.11" % "1.0.5")
+  case "2.11.8" => Some("org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.5")
   case  _ => None
 }
 
@@ -20,7 +20,7 @@ lazy val commonSettings = Seq(
   organizationHomepage := Some(url("http://www.indix.com")),
   version := appVersion,
   scalaVersion := "2.10.4",
-  crossScalaVersions := Seq("2.10.4", "2.11.8"),
+  crossScalaVersions := Seq("2.10.6", "2.11.11", "2.12.3"),
   parallelExecution in This := false,
   scalacOptions ++= Seq("-encoding", "UTF-8", "-deprecation", "-unchecked"),
   javacOptions ++= Seq("-Xlint:deprecation", "-source", "1.7"),
