@@ -1,5 +1,4 @@
 credentials += Credentials("Sonatype Nexus Repository Manager",
    "oss.sonatype.org",
-   sys.env("SONATYPE_USERNAME"),
-   sys.env("SONATYPE_PASSWORD"))
-
+   System.getenv("SONATYPE_USERNAME"),
+   System.getenv("SONATYPE_PASSWORD"))
