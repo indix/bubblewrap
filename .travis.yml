@@ -24,5 +24,4 @@ before_cache:
   - find $HOME/.sbt        -name "*.lock"               -print -delete
 
 after_success:
-- env
-- sbt +publish
+- 'sbt +publish'
