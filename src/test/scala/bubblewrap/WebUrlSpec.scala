@@ -50,9 +50,14 @@ class WebUrlSpec extends FlatSpec {
     WebUrl.from("http://www.example.com/a/?jsessionid=123&a=2&b=3").resolve("http://www.example.com/new/path").toString should be("http://www.example.com/new/path")
   }
 
-  it should "not remove hash fragments" in {
+  it should "not remove hash fragments when keepFragments=true" in {
     val url = "http://www.target.com/c/beauty-concierge-ways-to-shop-health/-/N-55md5#?lnk=snav_rd_beauty%20concierge&orginalSearchTerm=beauty+concierge||T:|C:"
-    WebUrl.from(url).toString should be(url)
+    WebUrl.from(url, keepFragments = true).toString should be(url)
+  }
+
+  it should "remove hash fragments when keepFragments=false" in {
+    val url = "http://www.target.com/c/beauty-concierge-ways-to-shop-health/-/N-55md5#?lnk=snav_rd_beauty%20concierge&orginalSearchTerm=beauty+concierge||T:|C:"
+    WebUrl.from(url).toString should be("http://www.target.com/c/beauty-concierge-ways-to-shop-health/-/N-55md5")
   }
 
 }
