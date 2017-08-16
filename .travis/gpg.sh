@@ -38,12 +38,12 @@ export GPG_KEYNAME=$(gpg -K | grep ^sec | cut -d/  -f2 | cut -d\  -f1 | head -n1
 shred --remove gen-key-script
 
 # publish the gpg key
-# (use keyserver.ubuntu.com as travis request keys from this server,
+# (use pool.sks-keyservers.net as sbt / sonatype request keys from this server,
 #  we avoid synchronization issues, while releasing)
-gpg --keyserver keyserver.ubuntu.com --send-keys ${GPG_KEYNAME}
+gpg --keyserver pool.sks-keyservers.net --send-keys ${GPG_KEYNAME}
 
 # wait for the key beeing accessible
 while(true); do
   date
-  gpg --keyserver keyserver.ubuntu.com  --recv-keys ${GPG_KEYNAME} && break || sleep 30
+  gpg --keyserver pool.sks-keyservers.net  --recv-keys ${GPG_KEYNAME} && break || sleep 30
 done
