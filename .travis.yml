@@ -2,7 +2,9 @@ language: scala
 
 jdk: oraclejdk8
 
-sbt_args: -no-colors -J-Xss2m
+script:
+ - sbt -no-colors -J-Xss2m +test
+ - sbt -no-colors -J-Xss2m +publish
 
 # Use container-based infrastructure
 sudo: false
@@ -23,5 +25,3 @@ before_cache:
   - find $HOME/.ivy2/cache -name "ivydata-*.properties" -print -delete
   - find $HOME/.sbt        -name "*.lock"               -print -delete
 
-after_success:
-- 'sbt +publish'
