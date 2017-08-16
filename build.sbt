@@ -33,6 +33,8 @@ lazy val commonSettings = Seq(
   publishMavenStyle := true,
   publishArtifact in(Compile, packageDoc) := true,
   publishArtifact in(Compile, packageSrc) := true,
+  useGpg := true,
+  pgpPassphrase := Some(Array()),
   publishTo := {
     val nexus = "https://oss.sonatype.org/"
     if (isSnapshot.value)
