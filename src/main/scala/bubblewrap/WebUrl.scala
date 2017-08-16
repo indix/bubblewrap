@@ -11,6 +11,7 @@ case class WebUrl(url: String) {
   override def toString = url
 
   def normalized(keepFragments: Boolean = false) = WebUrl.from(url, keepFragments = keepFragments)
+  def normalized = normalized(false)
 
   def resolve(relative: String) = WebUrl(new URL(new URL(url), relative).toString)
 }
