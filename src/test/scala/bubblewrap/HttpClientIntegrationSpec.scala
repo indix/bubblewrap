@@ -12,9 +12,8 @@ class HttpClientIntegrationSpec extends FlatSpec {
     val url = "https://www.indix.com"
     val client: HttpClient = new HttpClient()
     val body = client.get(WebUrl.from(url), CrawlConfig(None, "", 100000000, 10, Cookies.None)).map { response =>
-      println(response.status)
       response.pageResponse match {
-        case SuccessResponse(page) => println(new String(page.content))
+        case SuccessResponse(page) => new String(page.content)
         case FailureResponse(error) => error.printStackTrace(); List.empty[WebUrl]
       }
     }
