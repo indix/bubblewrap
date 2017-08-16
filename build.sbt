@@ -4,7 +4,7 @@ val jsoup = "org.jsoup" % "jsoup" % "1.8.1"
 val tika = "org.apache.tika" % "tika-core" % "1.4"
 
 val mockito = "org.mockito" % "mockito-all" % "1.9.5" % Test
-val scalatest = "org.scalatest" %% "scalatest" % "2.2.4" % Test
+val scalatest = "org.scalatest" %% "scalatest" % "3.0.3" % Test
 
 val appMajorVersion = "0.2."
 val appVersion = (Option(System.getenv("TRAVIS_TAG")).filterNot(_.trim.isEmpty) orElse Option(System.getenv("TRAVIS_BUILD_NUMBER")).map(appMajorVersion + _ + "-SNAPSHOT")).getOrElse("1.0.0-SNAPSHOT")
