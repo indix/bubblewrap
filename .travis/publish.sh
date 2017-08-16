@@ -11,7 +11,7 @@ then
     source .travis/gpg.sh
     echo "Generated a new GPG key pair and published it to a keyserver"
     echo "Attempting to publish signed jars"
-    sbt +publishSigned
+    echo $GPG_PASSPHRASE | sbt +publishSigned
     echo "Published the signed jars"
     echo "Attempting to make a release of the sonatype staging"
     sbt +sonatypeRelease
