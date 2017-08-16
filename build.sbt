@@ -7,7 +7,7 @@ val mockito = "org.mockito" % "mockito-all" % "1.9.5" % Test
 val scalatest = "org.scalatest" %% "scalatest" % "2.2.4" % Test
 
 val appMajorVersion = "0.2."
-val appVersion = (sys.env.get("TRAVIS_TAG") orElse sys.env.get("TRAVIS_BUILD_NUMBER").map(appMajorVersion + _ + "-SNAPSHOT")).getOrElse("1.0.0-SNAPSHOT")
+val appVersion = (Option(System.getenv("TRAVIS_TAG")) orElse Option(System.getenv("TRAVIS_BUILD_NUMBER")).map(appMajorVersion + _ + "-SNAPSHOT")).getOrElse("1.0.0-SNAPSHOT")
 
 def parserCombinator(version:String) :Option[ModuleID] = version match {
   case "2.11.11" | "2.12.3" => Some("org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.5")
