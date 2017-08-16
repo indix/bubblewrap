@@ -42,7 +42,7 @@ shred --remove gen-key-script
 #  we avoid synchronization issues, while releasing)
 gpg --keyserver pool.sks-keyservers.net --send-keys ${GPG_KEYNAME}
 
-# wait for the key beeing accessible
+# wait for the key being accessible
 while(true); do
   date
   gpg --keyserver pool.sks-keyservers.net  --recv-keys ${GPG_KEYNAME} && break || sleep 30
