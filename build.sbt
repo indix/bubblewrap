@@ -31,6 +31,8 @@ lazy val commonSettings = Seq(
     asyncHttpClient, commonsIo, jsoup, mockito, scalatest, tika
   ) ++ Seq(scalaVersion(parserCombinator).value).flatten,
   publishMavenStyle := true,
+  publishArtifact in(Compile, packageDoc) := true,
+  publishArtifact in(Compile, packageSrc) := true,
   publishTo := {
     val nexus = "https://oss.sonatype.org/"
     if (isSnapshot.value)
