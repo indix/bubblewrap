@@ -2,13 +2,13 @@ language: scala
 
 jdk: oraclejdk8
 
-script:
- - sbt -no-colors -J-Xss2m +test
- - sbt -no-colors -J-Xss2m +publish
-
 # Use container-based infrastructure
 sudo: false
 
+# List of environment variables are
+# - SONATYPE_USERNAME
+# - SONATYPE_PASSWORD
+# - GPG_EMAIL
 env:
   global:
   - secure: AQIag9V6RYSAGyjDp1T9q9mQkuJlVMDBeGa5ihuwJiGlyeYQ9KfcQ9ocJ805NpsANjwjgvisZn4u1y2l9PMQUG614tjFU5+7Vp2wrS6l9f3L7iz+l0cVdn7CAM8MPcb59QTMr90r/uofzOhQZco3SPLz9nHYfIPmPbc+/rTwk7NcXTMJwZBoRqc7BgXG/oJsJPFx3sZPFe4WmtMcJY4Ou4oRXZOvKCp7CCIATdlZg/Jy7v/m4VzJQRmtNa6OE2HZlzk6F3L+4SiTjKzAFF+Rnlxd6RImSHBGeHeOE8ACoRJIl8p3pfKlOW6ta6+9qNrT8ES/6iw6dsfCCKow8RRVktEILP2o2RCcP1omh10B7tPARWZSXDY/tL3pClV74z9w/n6I9jIhDsUxuccvm5m4N984PEg1/do8HZUe7cU+rn9j+koh/cmjDwhaQp6UAYD87lkskvkp2mMsVLsDDmHUqIMicjXJdTpxd302uXYNbfPEJ0A3eqZIHfUBnQkDG2QnJ6k0PzbMFj+gBnAfnaCUlQA4Quq5urrJetTMNMVr7EGFkn9BpMiBrod0CELJy8IiG4NSlS3EqGJBQUAnXJm8pBVpavs0SO/KfQ9T2oVATCj4+1coqsKVrHE2mC6uqSlZLQDAESIlVAtDfJz4ut69GvPFxbwHVUAqmxMsfZTgBoA=
@@ -24,3 +24,11 @@ before_cache:
   - find $HOME/.ivy2/cache -name "ivydata-*.properties" -print -delete
   - find $HOME/.sbt        -name "*.lock"               -print -delete
 
+deploy:
+  - provider: script
+    script: .travis/publish.sh
+    skip_cleanup: true
+    on:
+      repo: indix/bubblewrap
+      branch: master
+      jdk: oraclejdk8
