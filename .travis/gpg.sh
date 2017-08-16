@@ -5,8 +5,6 @@
 
 set -e
 
-# create a random passphrase
-export GPG_PASSPHRASE=$(echo "$RANDOM$(date)" | md5sum | cut -d\  -f1)
 export GPG_EMAIL=${GPG_EMAIL}
 
 # configuration to generate gpg keys

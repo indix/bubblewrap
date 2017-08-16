@@ -14,7 +14,7 @@ then
     sbt +publishSigned
     echo "Published the signed jars"
     echo "Attempting to make a release of the sonatype staging"
-    sbt +sonatypeRelease
+    sbt sonatypeRelease
     echo "Released the sonatype staging setup"
 else
     echo "Not running publish since we're either not in master or in a Pull Request"
