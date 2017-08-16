@@ -19,7 +19,6 @@ cat >gen-key-script <<EOF
     Name-Real: Indix
     Name-Email: ${GPG_EMAIL}
     Expire-Date: 2y
-    Passphrase: ${GPG_PASSPHRASE}
     %commit
     %echo done
 EOF
