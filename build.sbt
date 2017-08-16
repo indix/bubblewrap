@@ -7,7 +7,7 @@ val mockito = "org.mockito" % "mockito-all" % "1.9.5" % Test
 val scalatest = "org.scalatest" %% "scalatest" % "3.0.3" % Test
 
 val appMajorVersion = "0.2."
-val appVersion = (Option(System.getenv("TRAVIS_TAG")).filterNot(_.trim.isEmpty) orElse Option(System.getenv("TRAVIS_BUILD_NUMBER")).map(appMajorVersion + _)).getOrElse("1.0.0-SNAPSHOT")
+val appVersion = Option(System.getenv("TRAVIS_BUILD_NUMBER")).map(appMajorVersion + _).getOrElse("1.0.0-SNAPSHOT")
 
 def parserCombinator(version: String): Option[ModuleID] = version match {
   case "2.11.11" | "2.12.3" => Some("org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.5")
@@ -18,10 +18,7 @@ lazy val commonSettings = Seq(
   organization := "com.indix",
   organizationName := "Indix",
   organizationHomepage := Some(url("http://www.indix.com")),
-  version := {
-    println("Setting the version of the app to - " + appVersion)
-    appVersion
-  },
+  version := appVersion,
   scalaVersion := "2.10.4",
   crossScalaVersions := Seq("2.10.6", "2.11.11", "2.12.3"),
   parallelExecution in This := false,
@@ -33,8 +30,10 @@ lazy val commonSettings = Seq(
   publishMavenStyle := true,
   publishArtifact in(Compile, packageDoc) := true,
   publishArtifact in(Compile, packageSrc) := true,
+  /* START - sonatype publish related settings */
   useGpg := true,
   pgpPassphrase := Some(Array()),
+  /* END - sonatype publish related settings */
   publishTo := {
     val nexus = "https://oss.sonatype.org/"
     if (isSnapshot.value)
@@ -47,13 +46,13 @@ lazy val commonSettings = Seq(
       <licenses>
         <license>
           <name>Apache License</name>
-          <url>https://raw.githubusercontent.com/ind9/bubblewrap/master/LICENSE</url>
+          <url>https://www.apache.org/licenses/LICENSE-2.0</url>
           <distribution>repo</distribution>
         </license>
       </licenses>
       <scm>
-        <url>git@github.com:ind/bubblewrap.git</url>
-        <connection>scm:git:git@github.com:ind9/bubblewrap.git</connection>
+        <url>git@github.com:indix/bubblewrap.git</url>
+        <connection>scm:git:git@github.com:indix/bubblewrap.git</connection>
       </scm>
       <developers>
         <developer>
