@@ -32,7 +32,6 @@ lazy val commonSettings = Seq(
   publishArtifact in(Compile, packageSrc) := true,
 
   /* START - sonatype publish related settings */
-  useGpg := true,
   pgpSecretRing := file("local.secring.gpg"),
   pgpPublicRing := file("local.pubring.gpg"),
   // use empty string so it doesn't bomb when running locally
