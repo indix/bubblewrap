@@ -36,7 +36,7 @@ lazy val commonSettings = Seq(
   pgpSecretRing := file("local.secring.gpg"),
   pgpPublicRing := file("local.pubring.gpg"),
   // use empty string so it doesn't bomb when running locally
-  pgpPassphrase := Some(sys.env.get("SONATYPE_PASSWORD", "").toCharArray),
+  pgpPassphrase := Some(sys.env.getOrElse("SONATYPE_PASSWORD", "").toCharArray),
   /* END - sonatype publish related settings */
 
   publishTo := {
