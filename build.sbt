@@ -30,10 +30,15 @@ lazy val commonSettings = Seq(
   publishMavenStyle := true,
   publishArtifact in(Compile, packageDoc) := true,
   publishArtifact in(Compile, packageSrc) := true,
+
   /* START - sonatype publish related settings */
   useGpg := true,
-  pgpPassphrase := Some(Array()),
+  pgpSecretRing := file("local.secring.gpg"),
+  pgpPublicRing := file("local.pubring.gpg"),
+  // use empty string so it doesn't bomb when running locally
+  pgpPassphrase := Some(sys.env.get("SONATYPE_PASSWORD", "").toCharArray),
   /* END - sonatype publish related settings */
+
   publishTo := {
     val nexus = "https://oss.sonatype.org/"
     if (isSnapshot.value)
