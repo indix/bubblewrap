@@ -3,17 +3,18 @@ package bubblewrap
 import java.net.URL
 import java.util.concurrent.TimeUnit
 
-import io.netty.handler.ssl.{SslContextBuilder, SslProvider}
-import io.netty.util.HashedWheelTimer
-import org.asynchttpclient.proxy.ProxyServer
-import org.asynchttpclient.{DefaultAsyncHttpClient, DefaultAsyncHttpClientConfig, Realm}
 import io.netty.handler.codec.http.HttpHeaders.Names._
 import io.netty.handler.codec.http.HttpHeaders.Values._
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory
+import io.netty.handler.ssl.{SslContextBuilder, SslProvider}
+import io.netty.util.HashedWheelTimer
 import org.asynchttpclient.cookie.Cookie
 import org.asynchttpclient.netty.NettyResponseFuture
-import scala.concurrent.ExecutionContext.Implicits.global
+import org.asynchttpclient.proxy.ProxyServer
+import org.asynchttpclient.{DefaultAsyncHttpClient, DefaultAsyncHttpClientConfig, Realm}
+
 import scala.collection.JavaConverters._
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Try
 
 class HttpClient(clientSettings: ClientSettings = ClientSettings()) {
@@ -28,6 +29,7 @@ class HttpClient(clientSettings: ClientSettings = ClientSettings()) {
                                           .setAcceptAnyCertificate(true)
                                           .setMaxRequestRetry(clientSettings.retries)
                                           .setFollowRedirect(false)
+                                          .setKeepAlive(clientSettings.keepAlive)
                                           .setNettyTimer(timer).build())
 
 

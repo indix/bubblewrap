@@ -11,7 +11,8 @@ object RequestHeaders {
 }
 case class ClientSettings(socketTimeout:Int = 20000, connectionTimeout:Int = 30000, requestTimeout:Int = 60000,
                           readTimeout:Int = 60000, maxConnectionPerHost:Int = 16,
-                          maxTotalConnections:Int = 128, poolConnections:Boolean = true, retries:Int = 0)
+                          maxTotalConnections:Int = 128, poolConnections:Boolean = true, retries:Int = 0,
+                          keepAlive: Boolean = true)
 case class Cookies(cookies:Map[String,String])
 object Cookies {
   def None = Cookies(Map.empty)
