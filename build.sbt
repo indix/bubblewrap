@@ -72,3 +72,8 @@ lazy val bubblewrap = (project in file(".")).
   settings(
     name := "bubblewrap"
   )
+
+test in Test := {
+  dumpLicenseReport.value
+  (test in Test).value
+}
