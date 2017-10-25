@@ -10,6 +10,7 @@ import io.netty.handler.ssl.{SslContextBuilder, SslProvider}
 import io.netty.util.HashedWheelTimer
 import org.asynchttpclient.cookie.Cookie
 import org.asynchttpclient.netty.NettyResponseFuture
+import org.asynchttpclient.netty.channel.DefaultChannelPool
 import org.asynchttpclient.proxy.ProxyServer
 import org.asynchttpclient.{DefaultAsyncHttpClient, DefaultAsyncHttpClientConfig, Realm}
 
@@ -21,6 +22,7 @@ class HttpClient(clientSettings: ClientSettings = ClientSettings()) {
   val lenientSSLContext = SslContextBuilder.forClient().sslProvider(SslProvider.JDK).trustManager(InsecureTrustManagerFactory.INSTANCE).build()
 
   val timer = new HashedWheelTimer(100, TimeUnit.MILLISECONDS, 3072)
+  val pool = new DefaultChannelPool(60000, -1, DefaultChannelPool.PoolLeaseStrategy.FIFO, timer, 1000)
   val client = new DefaultAsyncHttpClient(new DefaultAsyncHttpClientConfig.Builder()
                                           .setConnectTimeout(clientSettings.connectionTimeout)
                                           .setRequestTimeout(clientSettings.requestTimeout)
@@ -30,6 +32,7 @@ class HttpClient(clientSettings: ClientSettings = ClientSettings()) {
                                           .setMaxRequestRetry(clientSettings.retries)
                                           .setFollowRedirect(false)
                                           .setKeepAlive(clientSettings.keepAlive)
+                                          .setChannelPool(pool)
                                           .setNettyTimer(timer).build())
 
 
