@@ -55,7 +55,7 @@ class HttpClient(clientSettings: ClientSettings = ClientSettings()) {
     request
       .addHeader(USER_AGENT, config.userAgent)
       .setCookies(HttpClient.cookies(config, url.toString).asJava)
-    config.customHeaders.headers.foreach(header => request.addHeader(header._1, header._2))
+    config.customHeaders.headers.foreach(header => request.addHeader(header._1.trim(), header._2))
     val nettyFuture = request.execute(handler)
     val responseFuture = handler.httpResponse.future
     responseFuture.onComplete(res => {
