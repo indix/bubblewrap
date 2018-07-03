@@ -22,7 +22,7 @@ class HttpClientIntegrationSpec extends FlatSpec {
   }
 
   it should "fetch some Gzip-ed page" in {
-    val url = "https://www.grainger.com/product-items-sitemap28.xml.gz"
+    val url = "https://en.wikipedia.org/wiki/Daft_Punk"
     val client: HttpClient = new HttpClient()
     val body = client.get(WebUrl.from(url), CrawlConfig(None, "" , 100000000, 10, Cookies.None)).map { response =>
       response.pageResponse match {
