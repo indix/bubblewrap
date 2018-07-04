@@ -12,8 +12,12 @@ import scala.collection.JavaConversions._
 case class Content(url: WebUrl, content: Array[Byte], contentType: Option[String] = None, contentCharset: Option[String] = None, contentEncoding: Option[String] = None) extends ContentType {
   def asString = {
     if (isGzip(this)) {
-      val gzipStream = new GZIPInputStream(new ByteArrayInputStream(content))
-      scala.io.Source.fromInputStream(gzipStream).mkString
+      try {
+        val gzipStream = new GZIPInputStream(new ByteArrayInputStream(content))
+        scala.io.Source.fromInputStream(gzipStream).mkString
+      } catch {
+        case e: Exception => new String(content, contentCharset.getOrElse("UTF-8"))
+      }
     } else {
       new String(content, contentCharset.getOrElse("UTF-8"))
     }
