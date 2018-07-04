@@ -8,16 +8,15 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 
 import scala.collection.JavaConversions._
+import scala.util.Try
 
 case class Content(url: WebUrl, content: Array[Byte], contentType: Option[String] = None, contentCharset: Option[String] = None, contentEncoding: Option[String] = None) extends ContentType {
   def asString = {
     if (isGzip(this)) {
-      try {
+      Try({
         val gzipStream = new GZIPInputStream(new ByteArrayInputStream(content))
         scala.io.Source.fromInputStream(gzipStream).mkString
-      } catch {
-        case e: Exception => new String(content, contentCharset.getOrElse("UTF-8"))
-      }
+      }).getOrElse(new String(content, contentCharset.getOrElse("UTF-8")))
     } else {
       new String(content, contentCharset.getOrElse("UTF-8"))
     }
