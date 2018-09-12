@@ -9,11 +9,9 @@ import io.netty.handler.codec.http.cookie.ClientCookieDecoder
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory
 import io.netty.handler.ssl.{SslContextBuilder, SslProvider}
 import io.netty.util.HashedWheelTimer
-import org.asynchttpclient.cookie.ThreadSafeCookieStore
 import org.asynchttpclient.netty.NettyResponseFuture
 import org.asynchttpclient.netty.channel.DefaultChannelPool
 import org.asynchttpclient.proxy.ProxyServer
-import org.asynchttpclient.uri.Uri
 import org.asynchttpclient.{DefaultAsyncHttpClient, DefaultAsyncHttpClientConfig, Realm}
 
 import scala.collection.JavaConverters._
@@ -78,8 +76,6 @@ object HttpClient {
   val oneYear = 360l * 24 * 60 * 60 * 1000
 
   def cookies(config: CrawlConfig, url: String) = {
-    val cookieStore = new ThreadSafeCookieStore()
-
     config.cookies.cookies
       .map(cookie => {
         val _cookie = ClientCookieDecoder.LAX.decode(s"${cookie._1}=${cookie._2}")
