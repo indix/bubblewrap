@@ -7,7 +7,8 @@ import bubblewrap.TestUtils._
 import io.netty.handler.codec.http.{DefaultHttpHeaders, HttpHeaders}
 import org.asynchttpclient.AsyncHandler.State
 import org.asynchttpclient.netty.NettyResponseStatus
-import org.asynchttpclient.{HttpResponseBodyPart, HttpResponseHeaders, HttpResponseStatus}
+import org.asynchttpclient.{HttpResponseBodyPart, HttpResponseStatus}
+import io.netty.handler.codec.http.{HttpHeaders => HttpResponseHeaders}
 import org.mockito.Mockito._
 import org.scalatest.FlatSpec
 import org.scalatest.Inside
@@ -26,7 +27,7 @@ class HttpHandlerSpec extends FlatSpec with Inside{
   def httpHeaders(headers:(String, String)*) = {
     val defaultHeaders = new DefaultHttpHeaders
     headers.foreach(h=>defaultHeaders.add(h._1,h._2))
-     new HttpResponseHeaders(defaultHeaders)
+    defaultHeaders
   }
 
   def bodyPart(value:Array[Byte]) = {
