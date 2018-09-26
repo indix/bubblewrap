@@ -14,9 +14,7 @@ import scala.util.Try
 case class Content(url: WebUrl, content: Array[Byte], contentType: Option[String] = None, contentCharset: Option[String] = None, contentEncoding: Option[String] = None) extends ContentType {
   def asString = {
     val charset = contentCharset.getOrElse("UTF-8").toUpperCase
-    lazy val decoder = Try({
-      Charset.forName(charset).newDecoder
-    }).getOrElse(Charset.forName("UTF-8").newDecoder())
+    lazy val decoder = Try(Charset.forName(charset).newDecoder).getOrElse(Charset.forName("UTF-8").newDecoder())
     if (isGzip(this)) {
       Try({
         val gzipStream = new GZIPInputStream(new ByteArrayInputStream(content))
@@ -36,19 +34,19 @@ case class Content(url: WebUrl, content: Array[Byte], contentType: Option[String
 
 trait ContentType {
   val gzipVariants = List(
+    "gzip",
     "application/gzip",
     "application/x-gzip",
     "application/x-gunzip",
     "application/gzipped",
     "application/gzip-compressed",
-    "gzip/document",
-    "gzip"
+    "gzip/document"
   )
 
-  def isGzip(content: Content) = {
+  def isGzip(content: Content): Boolean = {
     (content.contentEncoding, content.contentType) match {
-      case (_, Some(cType)) => gzipVariants.exists(gz => gz.equals(cType))
       case (Some(encoding), _) => gzipVariants.exists(gz => gz.equals(encoding))
+      case (_, Some(cType)) => gzipVariants.exists(gz => gz.equals(cType))
       case (_, _) => false
     }
   }
