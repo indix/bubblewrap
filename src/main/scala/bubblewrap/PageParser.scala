@@ -14,7 +14,9 @@ import scala.util.Try
 case class Content(url: WebUrl, content: Array[Byte], contentType: Option[String] = None, contentCharset: Option[String] = None, contentEncoding: Option[String] = None) extends ContentType {
   def asString = {
     val charset = contentCharset.getOrElse("UTF-8").toUpperCase
-    lazy val decoder = Charset.forName(charset).newDecoder
+    lazy val decoder = Try({
+      Charset.forName(charset).newDecoder
+    }).getOrElse(Charset.forName("UTF-8").newDecoder())
     if (isGzip(this)) {
       Try({
         val gzipStream = new GZIPInputStream(new ByteArrayInputStream(content))
