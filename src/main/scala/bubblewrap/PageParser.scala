@@ -1,6 +1,7 @@
 package bubblewrap
 
 import java.io.ByteArrayInputStream
+import java.nio.charset.Charset
 import java.util.regex.Pattern
 import java.util.zip.GZIPInputStream
 
@@ -12,13 +13,15 @@ import scala.util.Try
 
 case class Content(url: WebUrl, content: Array[Byte], contentType: Option[String] = None, contentCharset: Option[String] = None, contentEncoding: Option[String] = None) extends ContentType {
   def asString = {
+    val charset = contentCharset.getOrElse("UTF-8").toUpperCase
+    lazy val decoder = Charset.forName(charset).newDecoder
     if (isGzip(this)) {
       Try({
         val gzipStream = new GZIPInputStream(new ByteArrayInputStream(content))
-        scala.io.Source.fromInputStream(gzipStream).mkString
-      }).getOrElse(new String(content, contentCharset.getOrElse("UTF-8")))
+        scala.io.Source.fromInputStream(gzipStream)(decoder).mkString
+      }).getOrElse(new String(content, charset))
     } else {
-      new String(content, contentCharset.getOrElse("UTF-8"))
+      new String(content, charset)
     }
   }
 
@@ -36,13 +39,14 @@ trait ContentType {
     "application/x-gunzip",
     "application/gzipped",
     "application/gzip-compressed",
-    "gzip/document"
+    "gzip/document",
+    "gzip"
   )
 
   def isGzip(content: Content) = {
     (content.contentEncoding, content.contentType) match {
+      case (_, Some(cType)) => gzipVariants.exists(gz => gz.equals(cType))
       case (Some(encoding), _) => gzipVariants.exists(gz => gz.equals(encoding))
-      case (None, Some(cType)) => gzipVariants.exists(gz => gz.equals(cType))
       case (_, _) => false
     }
   }
