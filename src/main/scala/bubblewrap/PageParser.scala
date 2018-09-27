@@ -43,7 +43,7 @@ trait ContentType {
     "gzip/document"
   )
 
-  def isGzip(content: Content): Boolean = {
+  def isGzip(content: Content) = {
     (content.contentEncoding, content.contentType) match {
       case (Some(encoding), _) => gzipVariants.exists(gz => gz.equals(encoding))
       case (_, Some(cType)) => gzipVariants.exists(gz => gz.equals(cType))
