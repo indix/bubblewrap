@@ -39,7 +39,7 @@ class ContentSpec  extends FlatSpec{
 
   it should "read Gzipped content (with ISO-8859-1 encoding) to string" in {
     val encoding = "ISO-8859-1"
-    val gzipped = readAsBytes("/fixtures/2-ungzipped-iso8859-1.html")
+    val gzipped = readAsBytes("/fixtures/2-gzipped-iso8859-1.html")
     val ungzipped = readAsBytes("/fixtures/2-ungzipped-iso8859-1.html")
     val content = Content(WebUrl("http://www.example.com/dummy"), gzipped, contentType = Some("application/gzip; charset=iso-8859-1"), contentCharset = Some(encoding), contentEncoding = None)
 
