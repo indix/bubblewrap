@@ -19,20 +19,29 @@ class ContentSpec  extends FlatSpec{
     content.asString should be(koreanString)
   }
 
-  it should "read Gzipped content (with UTF-8 encoding) to string" in {
+  it should "read Gzipped content (with UTF-8 encoding & text/html content type) to string" in {
     val encoding = "UTF-8"
     val gzipped = readAsBytes("/fixtures/1-gzipped.html")
     val ungzipped = readAsBytes("/fixtures/1-ungzipped.html")
-    val content = Content(WebUrl("http://www.example.com/dummy"), gzipped, Some("text/html; charset=utf-8"), Some(encoding), Some("gzip"))
+    val content = Content(WebUrl("http://www.example.com/dummy"), gzipped, contentType = Some("text/html; charset=utf-8"), contentCharset = Some(encoding), contentEncoding = Some("gzip"))
+
+    content.asString should be (new String(ungzipped, encoding))
+  }
+
+  it should "read Gzipped content (with UTF-8 encoding & gzip content type) to string" in {
+    val encoding = "UTF-8"
+    val gzipped = readAsBytes("/fixtures/1-gzipped.html")
+    val ungzipped = readAsBytes("/fixtures/1-ungzipped.html")
+    val content = Content(WebUrl("http://www.example.com/dummy"), gzipped, contentType = Some("gzip"), contentCharset = Some(encoding), contentEncoding = Some("text/html; charset=UTF-8"))
 
     content.asString should be (new String(ungzipped, encoding))
   }
 
   it should "read Gzipped content (with ISO-8859-1 encoding) to string" in {
     val encoding = "ISO-8859-1"
-    val gzipped = readAsBytes("/fixtures/2-ungzipped-iso8859-1.html")
+    val gzipped = readAsBytes("/fixtures/2-gzipped-iso8859-1.html")
     val ungzipped = readAsBytes("/fixtures/2-ungzipped-iso8859-1.html")
-    val content = Content(WebUrl("http://www.example.com/dummy"), gzipped, Some("application/gzip; charset=iso-8859-1"), Some(encoding), None)
+    val content = Content(WebUrl("http://www.example.com/dummy"), gzipped, contentType = Some("application/gzip; charset=iso-8859-1"), contentCharset = Some(encoding), contentEncoding = None)
 
     content.asString should be (new String(ungzipped, encoding))
   }

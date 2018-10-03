@@ -44,11 +44,8 @@ trait ContentType {
   )
 
   def isGzip(content: Content) = {
-    (content.contentEncoding, content.contentType) match {
-      case (Some(encoding), _) => gzipVariants.exists(gz => gz.equals(encoding))
-      case (_, Some(cType)) => gzipVariants.exists(gz => gz.equals(cType))
-      case (_, _) => false
-    }
+    val cType: Option[String] = content.contentType.flatMap(_.split(";").headOption)
+    cType.exists(gzipVariants.contains) || content.contentEncoding.exists(gzipVariants.contains)
   }
 }
 
