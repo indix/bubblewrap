@@ -22,7 +22,7 @@ class HttpClient(clientSettings: ClientSettings = ClientSettings()) {
   val lenientSSLContext = SslContextBuilder.forClient().sslProvider(SslProvider.JDK).trustManager(InsecureTrustManagerFactory.INSTANCE).build()
 
   val timer = new HashedWheelTimer(100, TimeUnit.MILLISECONDS, 3072)
-  val pool = new DefaultChannelPool(60000, -1, DefaultChannelPool.PoolLeaseStrategy.FIFO, timer, 1000)
+//  val pool = new DefaultChannelPool(60000, -1, DefaultChannelPool.PoolLeaseStrategy.FIFO, timer, 1000)
   val client = new DefaultAsyncHttpClient(new DefaultAsyncHttpClientConfig.Builder()
                                           .setConnectTimeout(clientSettings.connectionTimeout)
                                           .setRequestTimeout(clientSettings.requestTimeout)
@@ -32,7 +32,10 @@ class HttpClient(clientSettings: ClientSettings = ClientSettings()) {
                                           .setMaxRequestRetry(clientSettings.retries)
                                           .setFollowRedirect(false)
                                           .setKeepAlive(clientSettings.keepAlive)
-                                          .setChannelPool(pool)
+//                                          .setChannelPool(pool)
+                                          .setMaxConnections(clientSettings.maxTotalConnections)
+                                          .setMaxConnectionsPerHost(clientSettings.maxConnectionPerHost)
+                                          .setPooledConnectionIdleTimeout(60000)
                                           .setNettyTimer(timer).build())
 
 
