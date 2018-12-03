@@ -1,6 +1,6 @@
 val asyncHttpClient = "org.asynchttpclient" % "async-http-client" % "2.5.3"
 val commonsIo = "commons-io" % "commons-io" % "2.4"
-val jsoup = "org.jsoup" % "jsoup" % "1.8.1"
+val jsoup = "org.jsoup" % "jsoup" % "1.11.3"
 val tika = "org.apache.tika" % "tika-core" % "1.4"
 
 val mockito = "org.mockito" % "mockito-all" % "1.9.5" % Test
