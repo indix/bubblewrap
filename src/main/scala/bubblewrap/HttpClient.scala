@@ -22,7 +22,6 @@ class HttpClient(clientSettings: ClientSettings = ClientSettings()) {
   val lenientSSLContext = SslContextBuilder.forClient().sslProvider(SslProvider.JDK).trustManager(InsecureTrustManagerFactory.INSTANCE).build()
 
   val timer = new HashedWheelTimer(100, TimeUnit.MILLISECONDS, 3072)
-  val pool = new DefaultChannelPool(60000, -1, DefaultChannelPool.PoolLeaseStrategy.FIFO, timer, 1000)
   val client = new DefaultAsyncHttpClient(new DefaultAsyncHttpClientConfig.Builder()
                                           .setConnectTimeout(clientSettings.connectionTimeout)
                                           .setRequestTimeout(clientSettings.requestTimeout)
@@ -32,7 +31,6 @@ class HttpClient(clientSettings: ClientSettings = ClientSettings()) {
                                           .setMaxRequestRetry(clientSettings.retries)
                                           .setFollowRedirect(false)
                                           .setKeepAlive(clientSettings.keepAlive)
-                                          .setChannelPool(pool)
                                           .setNettyTimer(timer).build())
 
 
@@ -56,15 +54,8 @@ class HttpClient(clientSettings: ClientSettings = ClientSettings()) {
       .addHeader(USER_AGENT, config.userAgent)
       .setCookies(HttpClient.cookies(config, url.toString).asJava)
     config.customHeaders.headers.foreach(header => request.addHeader(header._1.trim(), header._2))
-    val nettyFuture = request.execute(handler)
-    val responseFuture = handler.httpResponse.future
-    responseFuture.onComplete(res => {
-      Try(nettyFuture.asInstanceOf[NettyResponseFuture[Unit]].cancelTimeouts()).recover {
-        //Possible only if we're not using Netty Async HTTP Provider
-        case e => e.printStackTrace()
-      }.get
-    })
-    responseFuture
+    request.execute(handler)
+    handler.httpResponse.future
   }
 
   def shutDown() = {
