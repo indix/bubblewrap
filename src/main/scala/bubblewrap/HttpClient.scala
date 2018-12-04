@@ -54,7 +54,7 @@ class HttpClient(clientSettings: ClientSettings = ClientSettings()) {
       .addHeader(USER_AGENT, config.userAgent)
       .setCookies(HttpClient.cookies(config, url.toString).asJava)
     config.customHeaders.headers.foreach(header => request.addHeader(header._1.trim(), header._2))
-    request.execute(handler).done()
+    request.execute(handler)
     handler.httpResponse.future
   }
 
