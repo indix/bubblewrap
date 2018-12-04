@@ -28,7 +28,7 @@ case class Content(url: WebUrl, content: Array[Byte], contentType: Option[String
 
   private def decompress(contentBytes: Array[Byte]): Array[Byte] = {
     val inputStream = new ByteArrayInputStream(contentBytes)
-    val gzipInStream = new GZIPInputStream(inputStream)
+    val gzipInStream = new GZIPInputStream(inputStream, 512)
     val out = new ByteArrayOutputStream()
     try {
       IOUtils.copy(gzipInStream, out)

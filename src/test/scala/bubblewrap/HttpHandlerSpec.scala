@@ -14,6 +14,8 @@ import org.scalatest.FlatSpec
 import org.scalatest.Inside
 import org.scalatest.Matchers.{be, convertToAnyShouldWrapper}
 
+import scala.concurrent.Promise
+
 class HttpHandlerSpec extends FlatSpec with Inside{
   val config: CrawlConfig = CrawlConfig(None, "bubblewrap", 1000, 5, Cookies.None)
   val url = WebUrl("http://www.example.com/1")
@@ -37,7 +39,7 @@ class HttpHandlerSpec extends FlatSpec with Inside{
   }
 
   "HttpHandler" should "add parts to the body and fulfil body once complete" in {
-    val handler = new HttpHandler(config, url)
+    val handler = new HttpHandler(config, url, Promise[HttpResponse]())
     val response = handler.httpResponse.future
     handler.onStatusReceived(httpStatus(200))
 
@@ -55,7 +57,7 @@ class HttpHandlerSpec extends FlatSpec with Inside{
   }
 
   it should "abort in case the content-length header has larger size than in crawl config" in {
-    val handler = new HttpHandler(config, url)
+    val handler = new HttpHandler(config, url, Promise[HttpResponse]())
     val response = handler.httpResponse.future
     handler.onStatusReceived(httpStatus(200))
 
@@ -67,7 +69,7 @@ class HttpHandlerSpec extends FlatSpec with Inside{
   }
 
   it should "continue if the content-length is well within max size" in {
-    val handler = new HttpHandler(config, url)
+    val handler = new HttpHandler(config, url, Promise[HttpResponse]())
     val response = handler.httpResponse.future
     handler.onStatusReceived(httpStatus(200))
 
@@ -76,7 +78,7 @@ class HttpHandlerSpec extends FlatSpec with Inside{
   }
 
   it should "abort if the body content exceeds the max size" in {
-    val handler = new HttpHandler(config, url)
+    val handler = new HttpHandler(config, url, Promise[HttpResponse]())
     val response = handler.httpResponse.future
     handler.onStatusReceived(httpStatus(200))
 
@@ -90,7 +92,7 @@ class HttpHandlerSpec extends FlatSpec with Inside{
   }
 
   it should "have location in the response in case of redirects" in {
-    val handler = new HttpHandler(config, url)
+    val handler = new HttpHandler(config, url, Promise[HttpResponse]())
     val response = handler.httpResponse.future
     handler.onStatusReceived(httpStatus(302))
 
@@ -102,7 +104,7 @@ class HttpHandlerSpec extends FlatSpec with Inside{
 
   it should "use the content-type header to parse the body part" in {
     val koreanString = "동서게임 MS정품유선컨트롤러/PCGTA5호환 - 11번가"
-    val handler = new HttpHandler(config, url)
+    val handler = new HttpHandler(config, url, Promise[HttpResponse]())
     val response = handler.httpResponse.future
     handler.onStatusReceived(httpStatus(200))
 
@@ -117,7 +119,7 @@ class HttpHandlerSpec extends FlatSpec with Inside{
   }
 
   it should "use timeout error code when reporting connection and read timeouts" in {
-    val handler = new HttpHandler(config, url)
+    val handler = new HttpHandler(config, url, Promise[HttpResponse]())
     val response = handler.httpResponse.future
 
     handler.onThrowable(new TimeoutException("read timeout"))
@@ -126,7 +128,7 @@ class HttpHandlerSpec extends FlatSpec with Inside{
 
 
   it should "use unknown error code when reporting exceptions which arent timeouts" in {
-    val handler = new HttpHandler(config, url)
+    val handler = new HttpHandler(config, url, Promise[HttpResponse]())
     val response = handler.httpResponse.future
 
     handler.onThrowable(new RuntimeException("I dont know what went wrong, really")) 
@@ -135,7 +137,7 @@ class HttpHandlerSpec extends FlatSpec with Inside{
 
 
   it should "use remotely closed error code when reporting ioexception with remotely closed as message" in {
-    val handler = new HttpHandler(config, url)
+    val handler = new HttpHandler(config, url, Promise[HttpResponse]())
     val response = handler.httpResponse.future
 
     handler.onThrowable(new IOException("Remotely closed"))
@@ -143,7 +145,7 @@ class HttpHandlerSpec extends FlatSpec with Inside{
   }
 
   it should "not use captcha error code when content length is smaller than captcha content length for non 200 status" in {
-    val handler = new HttpHandler(config, url)
+    val handler = new HttpHandler(config, url, Promise[HttpResponse]())
     val response = handler.httpResponse.future
     handler.onStatusReceived(httpStatus(302))
 
