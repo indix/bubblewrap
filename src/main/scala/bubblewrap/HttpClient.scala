@@ -9,19 +9,16 @@ import io.netty.handler.codec.http.cookie.ClientCookieDecoder
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory
 import io.netty.handler.ssl.{SslContextBuilder, SslProvider}
 import io.netty.util.HashedWheelTimer
-import org.asynchttpclient.netty.NettyResponseFuture
-import org.asynchttpclient.netty.channel.DefaultChannelPool
 import org.asynchttpclient.proxy.ProxyServer
 import org.asynchttpclient.{DefaultAsyncHttpClient, DefaultAsyncHttpClientConfig, Realm}
 
 import scala.collection.JavaConverters._
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.Try
+import scala.concurrent.{ExecutionContext, Promise}
 
 class HttpClient(clientSettings: ClientSettings = ClientSettings()) {
   val lenientSSLContext = SslContextBuilder.forClient().sslProvider(SslProvider.JDK).trustManager(InsecureTrustManagerFactory.INSTANCE).build()
 
-  val timer = new HashedWheelTimer(100, TimeUnit.MILLISECONDS, 3072)
+  val timer = new HashedWheelTimer(100, TimeUnit.MILLISECONDS, 100)
   val client = new DefaultAsyncHttpClient(new DefaultAsyncHttpClientConfig.Builder()
                                           .setConnectTimeout(clientSettings.connectionTimeout)
                                           .setRequestTimeout(clientSettings.requestTimeout)
@@ -30,12 +27,13 @@ class HttpClient(clientSettings: ClientSettings = ClientSettings()) {
                                           .setUseInsecureTrustManager(true)
                                           .setMaxRequestRetry(clientSettings.retries)
                                           .setFollowRedirect(false)
-                                          .setKeepAlive(clientSettings.keepAlive)
-                                          .setNettyTimer(timer).build())
+                                          .setKeepAlive(clientSettings.keepAlive).setNettyTimer(timer)
+                                          .build())
 
 
-  def get(url: WebUrl, config: CrawlConfig) = {
-    val handler = new HttpHandler(config, url)
+  def get(url: WebUrl, config: CrawlConfig)(implicit ec: ExecutionContext) = {
+    val httpResponse = Promise[HttpResponse]()
+    val handler = new HttpHandler(config, url, httpResponse)
     val request = client.prepareGet(url.toString)
     config.proxy.foreach {
       case PlainProxy(host, port) => request.setProxyServer(new ProxyServer.Builder(host, port).build())
@@ -55,7 +53,11 @@ class HttpClient(clientSettings: ClientSettings = ClientSettings()) {
       .setCookies(HttpClient.cookies(config, url.toString).asJava)
     config.customHeaders.headers.foreach(header => request.addHeader(header._1.trim(), header._2))
     request.execute(handler)
-    handler.httpResponse.future
+    val responseFuture = httpResponse.future
+    // HashedWheelTimer maintains NettyResponseFutures till timeout task reaps them.
+    // AsyncHandlers are designed in a way to just store code, but storing HTTPResponse inside handler will bloat up the heap.
+    responseFuture.onComplete(_ => handler.httpResponse = null)
+    responseFuture
   }
 
   def shutDown() = {

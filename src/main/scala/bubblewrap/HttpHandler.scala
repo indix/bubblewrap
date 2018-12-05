@@ -4,17 +4,15 @@ package bubblewrap
 import java.io.IOException
 import java.util.concurrent.TimeoutException
 
-import io.netty.handler.codec.http.DefaultHttpHeaders
+import io.netty.handler.codec.http.{DefaultHttpHeaders, HttpHeaders => HttpResponseHeaders}
 import org.asynchttpclient.AsyncHandler.State
 import org.asynchttpclient.{AsyncHandler, HttpResponseBodyPart, HttpResponseStatus}
-import io.netty.handler.codec.http.{HttpHeaders => HttpResponseHeaders}
 
 import scala.concurrent.Promise
 
-class HttpHandler(config:CrawlConfig, url: WebUrl) extends AsyncHandler[Unit]{
+class HttpHandler(config:CrawlConfig, url: WebUrl, var httpResponse: Promise[HttpResponse]) extends AsyncHandler[Unit]{
   private[bubblewrap] var body = new ResponseBody
   var statusCode:Int = 200
-  val httpResponse = Promise[HttpResponse]()
   var headers: ResponseHeaders = new ResponseHeaders(new DefaultHttpHeaders)
   val startTime = System.currentTimeMillis()
   val UNKNOWN_ERROR = 1006
