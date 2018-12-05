@@ -54,6 +54,8 @@ class HttpClient(clientSettings: ClientSettings = ClientSettings()) {
     config.customHeaders.headers.foreach(header => request.addHeader(header._1.trim(), header._2))
     request.execute(handler)
     val responseFuture = httpResponse.future
+    // HashedWheelTimer maintains NettyResponseFutures till timeout task reaps them.
+    // AsyncHandlers are designed in a way to just store code, but storing HTTPResponse inside handler will bloat up the heap.
     responseFuture.onComplete(_ => handler.httpResponse = null)
     responseFuture
   }
