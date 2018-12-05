@@ -1,7 +1,7 @@
 package bubblewrap
 
 import java.net.URL
-import java.util.concurrent.{Executors, TimeUnit}
+import java.util.concurrent.TimeUnit
 
 import io.netty.handler.codec.http.HttpHeaders.Names._
 import io.netty.handler.codec.http.HttpHeaders.Values._
@@ -31,7 +31,7 @@ class HttpClient(clientSettings: ClientSettings = ClientSettings()) {
                                           .build())
 
 
-  def get(url: WebUrl, config: CrawlConfig) = {
+  def get(url: WebUrl, config: CrawlConfig)(implicit ec: ExecutionContext) = {
     val httpResponse = Promise[HttpResponse]()
     val handler = new HttpHandler(config, url, httpResponse)
     val request = client.prepareGet(url.toString)
@@ -54,7 +54,7 @@ class HttpClient(clientSettings: ClientSettings = ClientSettings()) {
     config.customHeaders.headers.foreach(header => request.addHeader(header._1.trim(), header._2))
     request.execute(handler)
     val responseFuture = httpResponse.future
-    responseFuture.onComplete(_ => handler.httpResponse = null)(HttpClient.executionContext)
+    responseFuture.onComplete(_ => handler.httpResponse = null)
     responseFuture
   }
 
@@ -64,9 +64,6 @@ class HttpClient(clientSettings: ClientSettings = ClientSettings()) {
 }
 
 object HttpClient {
-  private val executors          = Executors.newFixedThreadPool(1)
-  val executionContext  = ExecutionContext.fromExecutorService(executors)
-
   val oneYear = 360l * 24 * 60 * 60 * 1000
 
   def cookies(config: CrawlConfig, url: String) = {
