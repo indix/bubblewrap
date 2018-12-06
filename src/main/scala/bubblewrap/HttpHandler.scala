@@ -41,6 +41,7 @@ class HttpHandler(config:CrawlConfig, url: WebUrl, var httpResponse: Promise[Htt
     body.write(part)
     if (body.exceedsSize(config.maxSize)){
       httpResponse.success(HttpResponse(statusCode, FailureResponse(ExceededSize(config.maxSize)), headers, responseTime))
+      body = null
       return State.ABORT
     }
     State.CONTINUE
