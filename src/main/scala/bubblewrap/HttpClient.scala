@@ -20,17 +20,18 @@ class HttpClient(clientSettings: ClientSettings = ClientSettings()) {
   val lenientSSLContext = SslContextBuilder.forClient().sslProvider(SslProvider.JDK).trustManager(InsecureTrustManagerFactory.INSTANCE).build()
 
   val timer = new HashedWheelTimer(100, TimeUnit.MILLISECONDS, 100)
-  val client = new DefaultAsyncHttpClient(new DefaultAsyncHttpClientConfig.Builder()
-                                          .setConnectTimeout(clientSettings.connectionTimeout)
-                                          .setRequestTimeout(clientSettings.requestTimeout)
-                                          .setReadTimeout(clientSettings.readTimeout)
-                                          .setSslContext(lenientSSLContext)
-                                          .setUseInsecureTrustManager(true)
-                                          .setMaxRequestRetry(clientSettings.retries)
-                                          .setFollowRedirect(false)
-                                          .addRequestFilter(new ThrottleRequestFilter(clientSettings.maxTotalConnections, clientSettings.requestThrottleTimeout))
-                                          .setKeepAlive(clientSettings.keepAlive).setNettyTimer(timer)
-                                          .build())
+  private val asyncHttpClientConfigBuilder: DefaultAsyncHttpClientConfig.Builder = new DefaultAsyncHttpClientConfig.Builder()
+    .setConnectTimeout(clientSettings.connectionTimeout)
+    .setRequestTimeout(clientSettings.requestTimeout)
+    .setReadTimeout(clientSettings.readTimeout)
+    .setSslContext(lenientSSLContext)
+    .setUseInsecureTrustManager(true)
+    .setMaxRequestRetry(clientSettings.retries)
+    .setFollowRedirect(false)
+    .setKeepAlive(clientSettings.keepAlive).setNettyTimer(timer)
+
+  if(clientSettings.maxTotalConnections > 0) asyncHttpClientConfigBuilder.addRequestFilter(new ThrottleRequestFilter(clientSettings.maxTotalConnections, clientSettings.requestThrottleTimeout))
+  val client = new DefaultAsyncHttpClient(asyncHttpClientConfigBuilder.build())
 
 
   def get(url: WebUrl, config: CrawlConfig)(implicit ec: ExecutionContext) = {
