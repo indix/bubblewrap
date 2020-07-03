@@ -1,5 +1,8 @@
 language: scala
 
+# https://blog.travis-ci.com/2019-04-15-xenial-default-build-environment
+dist: trusty
+
 jdk: oraclejdk8
 
 # Use container-based infrastructure
